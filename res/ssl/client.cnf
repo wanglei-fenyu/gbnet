@@ -1,0 +1,24 @@
+[ req ]
+default_bits       = 2048
+default_keyfile    = server.key
+distinguished_name = req_distinguished_name
+req_extensions     = req_ext
+
+[ req_distinguished_name ]
+countryName                  = CN
+countryName_default          = CN
+stateOrProvinceName          = BeiJing
+stateOrProvinceName_default  = BeiJing
+localityName                 = BeiJing
+localityName_default         = BeiJing
+organizationName             = hm
+organizationName_default     = hm
+commonName                   = hm
+commonName_default           = server.example.com
+commonName_max               = 64
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = server.example.com
