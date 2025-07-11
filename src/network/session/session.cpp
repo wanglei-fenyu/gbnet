@@ -1,6 +1,6 @@
 
 #include "session.h"
-#include <gbnet/buffer/buffer_pack.hpp>
+#include "../buffer_pack.hpp"
 #include "../../common/timer_help.h"
 #include "gbnet/buffer/compressed_stream.h"
 namespace gb
