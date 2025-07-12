@@ -4,14 +4,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(def)
 include(base)
 
-# OpenSSL 1.1 兼容性设置
-add_compile_definitions(OPENSSL_API_COMPAT=10100)
-# Boost.Asio 修复
-add_compile_definitions(BOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
-
-# Boost.Bind 警告修复
-add_compile_definitions(BOOST_BIND_GLOBAL_PLACEHOLDERS)
-
 
 add_definitions(-DPROTOBUF_USE_DLLS)  # protobuf使用动态库
 add_compile_definitions(BOOST_ASIO_HAS_STD_THREAD) # asio使用std::thread
@@ -28,7 +20,7 @@ message("SOURCE FILES")
 message(${ALL_INC_SRC})
 if(LINUX)
 else()
-    #windown下分组
+    # Windows 下分组
     source_group(${PROJECT_NAME} TREE ${COMMON_CPP_DIR} FILES ${ALL_INC_SRC})
 endif()
 
@@ -37,43 +29,67 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     OUTPUT_NAME ${PROJECT_NAME}
     WINDOWS_EXPORT_ALL_SYMBOLS ON  # 确保 MSVC 生成 .lib
 )
-set(BOOST_ROOT ${CMAKE_SOURCE_DIR}/../boost)  # 设置 Boost 安装目录
-set(BOOST_INCLUDEDIR ${CMAKE_SOURCE_DIR}/../boost/include)  # 设置 Boost 头文件目录
 
-# 查找 Boost 头文件
+# 设置 Boost 路径
+set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/../boost")
+set(BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
+
+# 查找 Boost
 find_package(Boost 1.87 REQUIRED)
-
-# 如果 Boost 被找到，配置项目
 if(Boost_FOUND)
-	message("Boost find success")
-	message(${Boost_INCLUDE_DIRS})
-    include_directories(${Boost_INCLUDE_DIRS})
+    message("Boost find success")
+    message(${Boost_INCLUDE_DIRS})
+    target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
 endif()
 
+# 强制指定 OpenSSL 路径，禁止系统路径搜索
+set(OpenSSL_ROOT_DIR "${CMAKE_SOURCE_DIR}/../openssl")
+#find_package(OpenSSL 1.1 REQUIRED NO_DEFAULT_PATH NO_CMAKE_SYSTEM_PATH)
+#if(NOT OpenSSL_FOUND)
+#    message(FATAL_ERROR "OpenSSL 1.1 not found in ${OpenSSL_ROOT_DIR}")
+#endif()
+if(LINUX)
+    set(OPENSSL_LIBS
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/libssl.a"
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/libcrypto.a"
+    )
+else()
+    set(OPENSSL_LIBS
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/ssl-1_1-x64.lib"
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/crypto-1_1-x64.lib"
+    )
+endif()
+
+# 设置 Protobuf 路径并查找
+set(Protobuf_ROOT "${CMAKE_SOURCE_DIR}/../google-protobuf")
+find_package(Protobuf REQUIRED)
+
+# 头文件包含
 target_include_directories(${PROJECT_NAME} PRIVATE
-${CMAKE_SOURCE_DIR}/3rd
-${CMAKE_SOURCE_DIR}/3rd/openssl/include
-${CMAKE_SOURCE_DIR}/3rd/zlib
-${CMAKE_SOURCE_DIR}/3rd/asio
-${CMAKE_SOURCE_DIR}/3rd/protobuf
-${MY_INC}
+    ${CMAKE_SOURCE_DIR}/3rd
+    ${OpenSSL_ROOT_DIR}/include
+    ${Protobuf_ROOT}/include
+    ${CMAKE_SOURCE_DIR}/3rd/zlib
+    ${CMAKE_SOURCE_DIR}/3rd/asio
+    ${MY_INC}
 )
 
-
-
 target_link_directories(${PROJECT_NAME} PRIVATE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+
 if(LINUX)
-	set(LIB_NAMES "zlib"  "libssl" "libcrypto" "libprotobuf")
+    set(LIB_NAMES "zlib")
     appendSuffixInList(LIB_NAME_USE "${LIB_NAMES}" ".so")
-    message("```````````````````````````````````````````")
-    message(${LIB_NAME_USE})
+    message("LIB_NAME_USE: ${LIB_NAME_USE}")
 else()
-	set(LIB_NAMES "zlib" "ssl" "crypto" "libprotobuf")
+    set(LIB_NAMES "zlib")
     appendSuffixInList(LIB_NAME_USE "${LIB_NAMES}" ".lib")
 endif()
 
-message (${LIB_NAME_USE})
-target_link_libraries(${PROJECT_NAME} PRIVATE 
-${LIB_NAME_USE}
+message("LIB_NAME_USE: ${LIB_NAME_USE}")
 
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    ${LIB_NAME_USE}
+    ${OPENSSL_LIBS}
+    protobuf::libprotobuf
 )
+

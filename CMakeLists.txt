@@ -12,7 +12,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $<1:${PROJECT_SOURCE_DIR}/$<CONFIG>/bin>)
 set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(./3rd/spdlog)
-add_subdirectory(./3rd/openssl)
+#add_subdirectory(./3rd/openssl)
 add_subdirectory(./3rd/zlib)
 add_subdirectory(./3rd/lua)
 add_subdirectory(./3rd/mimalloc)

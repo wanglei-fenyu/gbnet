@@ -39,14 +39,16 @@ target_sources(${PROJECT_NAME} PRIVATE
 )
 
 
+set(OPENSSL_INC_DIR ${CMAKE_SOURCE_DIR}/../openssl)
+set(PROTOBUF_INC_DIR ${CMAKE_SOURCE_DIR}/../google-protobuf)
 target_include_directories(${PROJECT_NAME} PRIVATE
 ${CMAKE_SOURCE_DIR}/3rd
+${OPENSSL_INC_DIR}/include
+${PROTOBUF_INC_DIR}/include
 ${CMAKE_SOURCE_DIR}/3rd/lua
 ${CMAKE_SOURCE_DIR}/3rd/zlib
 ${CMAKE_SOURCE_DIR}/3rd/asio
-${CMAKE_SOURCE_DIR}/3rd/protobuf
 ${CMAKE_SOURCE_DIR}/3rd/spdlog/include
-${CMAKE_SOURCE_DIR}/3rd/openssl/include
 ${CMAKE_SOURCE_DIR}/3rd/mimalloc/include
 ${CMAKE_SOURCE_DIR}/3rd/gbnet
 ${CMAKE_SOURCE_DIR}/src
@@ -66,11 +68,28 @@ if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})  # 添加 Boost 头文件目录
 endif()
 
+set(OpenSSL_ROOT_DIR ${CMAKE_SOURCE_DIR}/../openssl)
+#find_package(OpenSSL REQUIRED)
+
 if(LINUX)
-	set(LIB_NAMES "zlib" "spdlog" "libssl" "libcrypto" "libprotobuf" "lua" "mimalloc" "gb_net")
+    set(OPENSSL_LIBS
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/libssl.a"
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/libcrypto.a"
+    )
+else()
+    set(OPENSSL_LIBS
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/ssl-1_1-x64.lib"
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/crypto-1_1-x64.lib"
+    )
+endif()
+set(Protobuf_ROOT ${CMAKE_SOURCE_DIR}/../google-protobuf)
+find_package(Protobuf REQUIRED)
+
+if(LINUX)
+	set(LIB_NAMES "zlib" "spdlog" "lua" "mimalloc" "gb_net")
     appendSuffixInList(LIB_NAME_USE "${LIB_NAMES}" ".so")
 else()
-	set(LIB_NAMES "zlib" "spdlog" "ssl" "crypto" "libprotobuf" "lua" "mimalloc" "gb_net")
+	set(LIB_NAMES "zlib" "spdlog" "lua" "mimalloc" "gb_net")
     appendSuffixInList(LIB_NAME_USE "${LIB_NAMES}" ".lib")
 endif()
 
@@ -79,4 +98,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY
 target_link_libraries(${PROJECT_NAME} PRIVATE 
 ${LIB_NAME_USE}
 ${Boost_LIBRARIES}
+${OPENSSL_LIBS}
+protobuf::libprotobuf
 )
