@@ -70,10 +70,17 @@ endif()
 
 set(OpenSSL_ROOT_DIR ${CMAKE_SOURCE_DIR}/../openssl)
 #find_package(OpenSSL REQUIRED)
-set(OPENSSL_LIBS
-    "${CMAKE_SOURCE_DIR}/../openssl/lib/ssl-1_1-x64.lib"
-    "${CMAKE_SOURCE_DIR}/../openssl/lib/crypto-1_1-x64.lib"
-)
+if(LINUX)
+    set(OPENSSL_LIBS
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/libssl.so"
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/libcrypto.so"
+    )
+else()
+    set(OPENSSL_LIBS
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/ssl-1_1-x64.lib"
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/crypto-1_1-x64.lib"
+    )
+endif()
 set(Protobuf_ROOT ${CMAKE_SOURCE_DIR}/../google-protobuf)
 find_package(Protobuf REQUIRED)
 

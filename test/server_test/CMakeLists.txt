@@ -73,8 +73,8 @@ set(OpenSSL_ROOT_DIR ${CMAKE_SOURCE_DIR}/../openssl)
 
 if(LINUX)
     set(OPENSSL_LIBS
-        "${CMAKE_SOURCE_DIR}/../openssl/lib/libssl.a"
-        "${CMAKE_SOURCE_DIR}/../openssl/lib/libcrypto.a"
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/libssl.so"
+        "${CMAKE_SOURCE_DIR}/../openssl/lib/libcrypto.so"
     )
 else()
     set(OPENSSL_LIBS
