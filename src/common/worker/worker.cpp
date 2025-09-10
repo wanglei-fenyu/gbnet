@@ -30,26 +30,20 @@ void Worker::OnStart()
 	//×¢²áÏûÏ¢¼àÌý
 
 	//¼ÓÔØ½Å±¾
-	using sol::lib;
-	if (!scriptPtr_)
-		return;
-	scriptPtr_->open_libraries(lib::base, lib::package,lib::string,lib::table,lib::os,lib::bit32,lib::coroutine,lib::count,lib::debug,lib::ffi,lib::io,lib::jit,lib::math,lib::utf8);
-	//×¢²á½Å±¾ 
-	register_script(scriptPtr_);
-	std::string scriptRootPath;
-
-	scriptRootPath = ResPath::Instance()->FindResPath("script/main.lua");
-	scriptPtr_->Load(scriptRootPath);
-}
+    InitLua();
+}   
 
 
 void Worker::Run()
 {
     while (runing_)
     {
-        std::function<void(void)> func;
-        events_.wait_dequeue(func);
-        func();
+        if (events_.size_approx() > 0)
+        {
+			std::function<void(void)> func;
+			events_.try_dequeue(func);
+			func();
+        }
     }
 }
 
@@ -108,6 +102,22 @@ uint32_t Worker::GetIndex()
 std::unique_ptr<TimerManager>& Worker::GetTimerManager()
 {
     return timer_manager_;
+}
+
+void Worker::InitLua()
+{
+	using sol::lib;
+	if (!scriptPtr_)
+		return;
+	scriptPtr_->open_libraries(lib::base, lib::package,lib::string,lib::table,lib::os,lib::bit32,lib::coroutine,lib::count,lib::debug,lib::ffi,lib::io,lib::jit,lib::math,lib::utf8);
+	//×¢²á½Å±¾ 
+	register_script(scriptPtr_);
+	std::string scriptRootPath;
+
+	scriptRootPath = ResPath::Instance()->FindResPath("script/main.lua");
+    sol::function require = (*scriptPtr_)["require"];
+    require("socket.core");
+	scriptPtr_->Load(scriptRootPath);
 }
 
 }

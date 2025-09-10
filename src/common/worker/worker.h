@@ -5,8 +5,7 @@
 #include "../../script/script.h"
 #include "../singleton.h"
 #include <gbnet/common/define.h>
-//#include "concurrentqueue/concurrentqueue.h"
-#include "concurrentqueue/blockingconcurrentqueue.h"
+#include "concurrentqueue/concurrentqueue.h"
 #include "../timer/timer_manager.h"
 namespace gb
 {
@@ -40,10 +39,13 @@ public:
     std::unique_ptr<TimerManager>& GetTimerManager();
 
 private:
+    void InitLua();
+
+private:
 	ScriptPtr	scriptPtr_;
     uint32_t      index_;
     uint32_t	thread_id_;	 
-	moodycamel::BlockingConcurrentQueue<std::function<void(void)>> events_;
+	moodycamel::ConcurrentQueue<std::function<void(void)>> events_;
     std::unique_ptr<TimerManager>                                  timer_manager_;
 	std::atomic<bool> runing_ = false;
 };
