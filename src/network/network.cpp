@@ -255,7 +255,7 @@ void net_init()
 	
 	if (!gs_Server->Start(uir))
 	{
-        LOG_ERROR("server start fail");
+        LOG_ERROR("server start fail:",uir);
 	}
 }
 

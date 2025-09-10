@@ -74,8 +74,12 @@ SET_TARGET_PROPERTIES(luasocket PROPERTIES
 
 
 
-IF(WIN32)
-find_library (LUA_LIB lua "${CMAKE_CURRENT_LIST_DIR}/../../lib/win/")
-TARGET_LINK_LIBRARIES(luasocket ${LUASOCKET_LINK_FLAGS} lua ws2_32.lib)
-ELSSEIF
-ENDIF
+find_library (LUA_LIB lua "${CMAKE_CURRENT_LIST_DIR}/../../Release/lib/")
+message(${CMAKE_CURRENT_LIST_DIR}/../../Release/lib/)
+target_link_libraries(luasocket ${LUA_LIB})
+#IF(WIN32)
+#TARGET_LINK_LIBRARIES(luasocket ${LUASOCKET_LINK_FLAGS} lua ws2_32.lib)
+#ELSE()
+#TARGET_LINK_LIBRARIES(luasocket ${LUASOCKET_LINK_FLAGS} lua)
+#
+#ENDIF()

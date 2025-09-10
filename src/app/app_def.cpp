@@ -2,7 +2,7 @@
 #include "../common/res_path.h"
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_utils.hpp"
-
+#include <gbnet/common/def.h>
 AppTypeMgr::AppTypeMgr()
 {
 	_names.insert(std::make_pair(APP_TYPE::APP_Global, "global"));
@@ -45,11 +45,11 @@ std::pair<std::string, std::string> AppTypeMgr::GetServerIpPort(int os_type)
 	{
 	case UIR_TYPE::UT_None:
 
-#if ENGINE_PLATFORM != PLATFORM_WIN32		
+	#if WIN32
+		uir_name = "win_tcp";
+	#else
 		uir_name = "linux_tcp";
-#else
-        uir_name = "win_tcp";
-#endif
+	#endif
 		break;
 	case UIR_TYPE::UT_WIN_TCP:
         uir_name = "win_tcp";

@@ -5,11 +5,13 @@
 #include <chrono>
 #include <iomanip>
 #include <mutex>
+#include <format>
+#include <source_location>
 
 namespace netlog
 {
 
-// Ê¹ÓÃ enum class ±ÜÃâÃüÃû³åÍ»
+// ä½¿ç”¨ enum class é¿å…åç§°å†²çª
 enum class Level : uint8_t
 {
     Trace,
@@ -17,38 +19,48 @@ enum class Level : uint8_t
     Info,
     Warning,
     Error,
-    Fatal // Ìæ´ú CRITICAL ±ÜÃâÇ±ÔÚ³åÍ»
+    Fatal
 };
 
-// Ïß³Ì°²È«µÄÈÕÖ¾Êä³ö
+// çº¿ç¨‹å®‰å…¨çš„æ—¥å¿—æµ
 inline std::ostream& getLogStream()
 {
-    static std::mutex           logMutex;
+    static std::mutex logMutex;
     std::lock_guard<std::mutex> lock(logMutex);
     return std::cerr;
 }
 
-// »ñÈ¡´øºÁÃëµÄµ±Ç°Ê±¼ä×Ö·û´®
+// è·å–æ ¼å¼åŒ–çš„å½“å‰æ—¶é—´å­—ç¬¦ä¸²
 inline std::string getCurrentTime()
 {
     auto now = std::chrono::system_clock::now();
-    auto ms  = std::chrono::duration_cast<std::chrono::milliseconds>(
-                  now.time_since_epoch()) %
-        1000;
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                  now.time_since_epoch()) % 1000;
     auto in_time_t = std::chrono::system_clock::to_time_t(now);
 
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %H:%M:%S")
-       << '.' << std::setfill('0') << std::setw(3) << ms.count();
-    return ss.str();
+    std::tm time_info;
+    #ifdef _WIN32
+    localtime_s(&time_info, &in_time_t);
+    #else
+    localtime_r(&in_time_t, &time_info);
+    #endif
+
+    char buffer[20];
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &time_info);
+
+    return std::format("{}.{:03d}", buffer, ms.count());
 }
 
-// ÈÕÖ¾ÊµÏÖ
-inline void logImpl(Level level, const std::string& message)
+// æ—¥å¿—å®ç°
+template<typename... Args>
+inline void logImpl(Level level, std::format_string<Args...> fmt, Args&&... args)
 {
     static const char* levelNames[] = {
         "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
+    // ä½¿ç”¨ std::format è¿›è¡Œæ ¼å¼åŒ–
+    std::string message = std::format(fmt, std::forward<Args>(args)...);
+    
     auto& stream = getLogStream();
     stream << "[" << getCurrentTime() << "] "
            << "[" << levelNames[static_cast<uint8_t>(level)] << "] "
@@ -62,63 +74,35 @@ inline void logImpl(Level level, const std::string& message)
 
 } // namespace netlog
 
-// ÈÕÖ¾ºê£¨´øNETÇ°×º£©
-#define NET_LOG_TRACE(...)                               \
-    do {                                                 \
-        std::stringstream ss;                            \
-        ss << __VA_ARGS__;                               \
-        netlog::logImpl(netlog::Level::Trace, ss.str()); \
+// ä½¿ç”¨ C++20 ç‰¹æ€§çš„æ—¥å¿—å®
+#define NET_LOG_TRACE(fmt, ...) \
+    netlog::logImpl(netlog::Level::Trace, fmt, ##__VA_ARGS__)
+
+#define NET_LOG_DEBUG(fmt, ...) \
+    netlog::logImpl(netlog::Level::Debug, fmt, ##__VA_ARGS__)
+
+#define NET_LOG_INFO(fmt, ...) \
+    netlog::logImpl(netlog::Level::Info, fmt, ##__VA_ARGS__)
+
+#define NET_LOG_WARN(fmt, ...) \
+    netlog::logImpl(netlog::Level::Warning, fmt, ##__VA_ARGS__)
+
+#define NET_LOG_ERROR(fmt, ...) \
+    netlog::logImpl(netlog::Level::Error, fmt, ##__VA_ARGS__)
+
+#define NET_LOG_FATAL(fmt, ...) \
+    netlog::logImpl(netlog::Level::Fatal, fmt, ##__VA_ARGS__)
+
+// æ¡ä»¶æ—¥å¿—
+#define NET_LOG_IF(condition, fmt, ...) \
+    do { \
+        if (condition) \
+            netlog::logImpl(netlog::Level::Error, fmt, ##__VA_ARGS__); \
     } while (0)
 
-#define NET_LOG_DEBUG(...)                               \
-    do {                                                 \
-        std::stringstream ss;                            \
-        ss << __VA_ARGS__;                               \
-        netlog::logImpl(netlog::Level::Debug, ss.str()); \
-    } while (0)
-
-#define NET_LOG_INFO(...)                               \
-    do {                                                \
-        std::stringstream ss;                           \
-        ss << __VA_ARGS__;                              \
-        netlog::logImpl(netlog::Level::Info, ss.str()); \
-    } while (0)
-
-#define NET_LOG_WARN(...)                                  \
-    do {                                                   \
-        std::stringstream ss;                              \
-        ss << __VA_ARGS__;                                 \
-        netlog::logImpl(netlog::Level::Warning, ss.str()); \
-    } while (0)
-
-#define NET_LOG_ERROR(...)                               \
-    do {                                                 \
-        std::stringstream ss;                            \
-        ss << __VA_ARGS__;                               \
-        netlog::logImpl(netlog::Level::Error, ss.str()); \
-    } while (0)
-
-#define NET_LOG_FATAL(...)                               \
-    do {                                                 \
-        std::stringstream ss;                            \
-        ss << __VA_ARGS__;                               \
-        netlog::logImpl(netlog::Level::Fatal, ss.str()); \
-    } while (0)
-
-// Ìõ¼şÈÕÖ¾
-#define NET_LOG_IF(condition, ...)                           \
-    do {                                                     \
-        if (condition)                                       \
-        {                                                    \
-            std::stringstream ss;                            \
-            ss << __VA_ARGS__;                               \
-            netlog::logImpl(netlog::Level::Error, ss.str()); \
-        }                                                    \
-    } while (0)
-
-// ¼ì²éºê
+// æ£€æŸ¥å®
 #define NET_CHECK(expression) \
-    NET_LOG_IF(!(expression), "CHECK failed: " #expression)
+    NET_LOG_IF(!(expression), "CHECK failed: {}", #expression)
 
 #define NET_CHECK_EQ(a, b) NET_CHECK((a) == (b))
 #define NET_CHECK_NE(a, b) NET_CHECK((a) != (b))
