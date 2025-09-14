@@ -112,14 +112,15 @@ void Worker::InitLua()
 	scriptPtr_->open_libraries(lib::base, lib::package,lib::string,lib::table,lib::os,lib::bit32,lib::coroutine,lib::count,lib::debug,lib::ffi,lib::io,lib::jit,lib::math,lib::utf8);
 	//注册脚本 
 	register_script(scriptPtr_);
-	std::string scriptRootPath;
-
-	scriptRootPath = ResPath::Instance()->FindResPath("script/main.lua");
     sol::function require = (*scriptPtr_)["require"];
 #ifdef MY_DEBUG_MODE
     std::string _lua_socket = ResPath::Instance()->FindResPath("../Debug/bin/");
 #else 
     std::string _lua_socket = ResPath::Instance()->FindResPath("../Release/bin/");
+#endif
+
+#if ENGINE_PLATFORM != PLATFORM_WIN32	
+    _lua_socket += "?.so";
 #endif
     //加载luasocket
     std::string package_cpath = (*scriptPtr_)["package"]["cpath"].get<std::string>();
@@ -130,11 +131,17 @@ void Worker::InitLua()
 	//LuaPanda
 	std::string script_path =  ResPath::Instance()->FindResPath("/script");
 	std::string package_path = (*scriptPtr_)["package"]["path"];
-    package_path += ";" + script_path + "/LuaPanda.lua";
+    package_path += ";" + script_path + "/?.lua";
     (*scriptPtr_)["package"]["path"] = package_path;
     //启动调试
-    sol::object result = scriptPtr_->safe_script_file(script_path + "/start_debug.lua");
+    auto result = scriptPtr_->safe_script_file(script_path + "/start_debug.lua");
+    if (!result.valid()) {
+        sol::error err = result;
+     
+        LOG_ERROR("Start Lua Debug Fail {}",err.what());
+    }
 
+	std::string scriptRootPath = ResPath::Instance()->FindResPath("script/main.lua");
 	scriptPtr_->Load(scriptRootPath);
 }
 
