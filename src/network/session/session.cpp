@@ -376,7 +376,7 @@ void Session::OnHeartbeat(const Error_code& ec)
         {
 			Send(nullptr);
         }
-		_heartbeat_timer.expires_at(_heartbeat_timer.expires_at() + CHRONO_SECOND(_heartbeat_duration));
+        _heartbeat_timer.expires_at(_heartbeat_timer.expiry() + std::chrono::duration_cast<std::chrono::microseconds>(_heartbeat_duration));
         _heartbeat_timer.async_wait([this](const Error_code& ec)
             {
                  OnHeartbeat(ec);
@@ -390,7 +390,7 @@ void Session::StartHeartbeat(duration_t _time_duration)
     _start_heartbeat.store(true);
     if (_start_heartbeat.load())
     {
-        _heartbeat_timer.expires_from_now(CHRONO_SECOND(_time_duration));
+        _heartbeat_timer.expires_after(std::chrono::duration_cast<std::chrono::microseconds>(_time_duration));
         _heartbeat_timer.async_wait([this](const Error_code& ec) {
             OnHeartbeat(ec);
             });

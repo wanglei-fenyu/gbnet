@@ -57,7 +57,7 @@ private:
     session_sent_callback_t      _sent_callbcak;
     std::function<IoServicePoolPtr()> _get_io_service_pool_fun;
 
-    Asio::deadline_timer         _heartbeat_timer;
+    Asio::steady_timer           _heartbeat_timer;
     duration_t                   _heartbeat_duration;
     std::atomic<bool>            _start_heartbeat;
 

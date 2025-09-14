@@ -26,7 +26,7 @@ private:
     duration_t  _time_duration;
     WorkRoutine _work_routine;
     bool        _is_runing;
-    Asio::deadline_timer _timer;
+    Asio::steady_timer   _timer;
     std::mutex           _timer_mutex;
     IoServiceStrand      _strand;
 };
