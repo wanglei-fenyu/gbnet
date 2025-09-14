@@ -28,3 +28,4 @@ void Test_Register();
 
 void SendMsg1(std::shared_ptr<gb::Client> client);
 void SendRpc(std::shared_ptr<gb::Client> client);
+void http_test(std::shared_ptr<gb::Client> client);

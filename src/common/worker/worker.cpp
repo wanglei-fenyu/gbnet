@@ -116,7 +116,25 @@ void Worker::InitLua()
 
 	scriptRootPath = ResPath::Instance()->FindResPath("script/main.lua");
     sol::function require = (*scriptPtr_)["require"];
+#ifdef MY_DEBUG_MODE
+    std::string _lua_socket = ResPath::Instance()->FindResPath("../Debug/bin/");
+#else 
+    std::string _lua_socket = ResPath::Instance()->FindResPath("../Release/bin/");
+#endif
+    //º”‘ÿluasocket
+    std::string package_cpath = (*scriptPtr_)["package"]["cpath"].get<std::string>();
+    (*scriptPtr_)["package"]["cpath"] = package_cpath + ";" + _lua_socket;
     require("socket.core");
+
+
+	//LuaPanda
+	std::string script_path =  ResPath::Instance()->FindResPath("/script");
+	std::string package_path = (*scriptPtr_)["package"]["path"];
+    package_path += ";" + script_path + "/LuaPanda.lua";
+    (*scriptPtr_)["package"]["path"] = package_path;
+    //∆Ù∂Øµ˜ ‘
+    sol::object result = scriptPtr_->safe_script_file(script_path + "/start_debug.lua");
+
 	scriptPtr_->Load(scriptRootPath);
 }
 

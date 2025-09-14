@@ -1,5 +1,6 @@
 ﻿#include "test.h"
 #include "network.h"
+#include "network/http/http_client.h"
 void hello(TestMsg& msg)
 {
 	LOG_INFO("index:{}  msg{}",msg.index(), msg.msg());
@@ -40,6 +41,21 @@ void SendRpc(std::shared_ptr<gb::Client> client)
 }
 
 
+void http_test(std::shared_ptr<gb::Client> client)
+{
+    auto& service     = client->GetIoServicePool()->GetIoService().second;
+    auto http_client = std::make_shared<HttpClient>(service);
+    boost::asio::co_spawn(service, [http_client]() -> boost::asio::awaitable<void> {
+            std::string uir = "www.baidu.com";
+            std::string port = "80";
+            std::string path = "/";
+            auto res = co_await http_client->GetAsync(uir,port,path);
+        std::cout << "Coroutine GET status: " << res.status << "\n";
+        std::cout << "Body length: " << res.body.size() << "\n";
+        std::cout << "Body length: " << res.body<< "\n";
+        co_return;
+    }, boost::asio::detached);
+}
 
 //async_simple::coro::Lazy<> test_coro(gb::SessionPtr& session)
 //{

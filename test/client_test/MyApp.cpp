@@ -68,6 +68,8 @@ int MyApp::OnInit()
            // SendRpc(client_);
             test_coro_2(client_->GetSession(gb::CONNECT_TYPE::CT_GATEWAY)).start([](auto&&) {});
             });
+
+        http_test(client_);
     });
 
     

@@ -8,9 +8,9 @@
 
 namespace strutil {
 
-    inline int stricmp( char const* c1, char const* c2 ) {
-        return engine_stricmp( c1, c2 );
-    }
+    //inline int stricmp( char const* c1, char const* c2 ) {
+    //    return engine_stricmp( c1, c2 );
+    //}
 
     inline std::string format( const char * _format, ... ) {
         std::string str;
