@@ -35,7 +35,7 @@ set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/../boost")
 set(BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
 
 # 查找 Boost
-find_package(Boost 1.87 REQUIRED)
+find_package(Boost 1.89 REQUIRED)
 if(Boost_FOUND)
     message("Boost find success")
     message(${Boost_INCLUDE_DIRS})
