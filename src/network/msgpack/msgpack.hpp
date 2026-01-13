@@ -1716,11 +1716,15 @@ NAMESPACE_END
 
 #define REGISTER_PACKER(...)                                   \
 public:                                                        \
-    void pack(gb::msgpack::Packer &packer)               \
+    virtual void pack(gb::msgpack::Packer &packer)             \
     {                                                          \
         packer(__VA_ARGS__);                                   \
     }                                                          \
-    void unpack(gb::msgpack::Unpacker &unpacker)         \
+    virtual void unpack(gb::msgpack::Unpacker &unpacker)       \
     {                                                          \
         unpacker(__VA_ARGS__);                                 \
     }
+
+
+
+
