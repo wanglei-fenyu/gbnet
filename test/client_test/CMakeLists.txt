@@ -58,7 +58,7 @@ set(BOOST_ROOT ${CMAKE_SOURCE_DIR}/../boost)
 # 设置 Boost 头文件目录
 set(BOOST_INCLUDEDIR ${CMAKE_SOURCE_DIR}/../boost/include)  
 # 查找 Boost
-find_package(Boost 1.89 REQUIRED COMPONENTS charconv)
+find_package(Boost 1.90 REQUIRED COMPONENTS charconv)
 
 # 如果 Boost 被找到，配置项目
 if(Boost_FOUND)
