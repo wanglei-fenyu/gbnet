@@ -5,9 +5,9 @@ project(lua_project)
 if(WIN32)
     add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/source-charset:utf-8>")
     add_compile_options("$<$<C_COMPILER_ID:MSVC>:/source-charset:utf-8>")
-endif()
-    add_definitions(-DLUA_USE_DLOPEN)
 else()	
+    add_definitions(-DLUA_USE_DLOPEN)
+endif()
 
 # 包含当前目录作为头文件目录
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
