@@ -47,7 +47,6 @@ ${OPENSSL_INC_DIR}/include
 ${PROTOBUF_INC_DIR}/include
 ${CMAKE_SOURCE_DIR}/3rd/lua
 ${CMAKE_SOURCE_DIR}/3rd/zlib
-${CMAKE_SOURCE_DIR}/3rd/asio
 ${CMAKE_SOURCE_DIR}/3rd/spdlog/include
 ${CMAKE_SOURCE_DIR}/3rd/mimalloc/include
 ${CMAKE_SOURCE_DIR}/3rd/gbnet

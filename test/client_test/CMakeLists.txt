@@ -46,7 +46,6 @@ ${CMAKE_SOURCE_DIR}/3rd/lua
 ${CMAKE_SOURCE_DIR}/3rd/zlib
 ${OPENSSL_INC_DIR}/include
 ${PROTOBUF_INC_DIR}/include
-${CMAKE_SOURCE_DIR}/3rd/asio
 ${CMAKE_SOURCE_DIR}/3rd/spdlog/include
 ${CMAKE_SOURCE_DIR}/3rd/mimalloc/include
 ${CMAKE_SOURCE_DIR}/3rd/gbnet
@@ -86,7 +85,7 @@ find_package(Protobuf REQUIRED)
 
 if(LINUX)
 	set(LIB_NAMES "zlib" "spdlog" "lua" "mimalloc" "gb_net")
-    appendSuffixInList(LIB_NAME_USE "${LIB_NAMES}" ".so")
+
 else()
 	set(LIB_NAMES "zlib" "spdlog" "lua" "mimalloc" "gb_net")
     appendSuffixInList(LIB_NAME_USE "${LIB_NAMES}" ".lib")

@@ -70,7 +70,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${OpenSSL_ROOT_DIR}/include
     ${Protobuf_ROOT}/include
     ${CMAKE_SOURCE_DIR}/3rd/zlib
-    ${CMAKE_SOURCE_DIR}/3rd/asio
     ${MY_INC}
 )
 
