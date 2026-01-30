@@ -85,7 +85,7 @@ find_package(Protobuf REQUIRED)
 
 if(LINUX)
 	set(LIB_NAMES "zlib" "spdlog" "lua" "mimalloc" "gb_net")
-
+    appendSuffixInList(LIB_NAME_USE "${LIB_NAMES}" ".so")
 else()
 	set(LIB_NAMES "zlib" "spdlog" "lua" "mimalloc" "gb_net")
     appendSuffixInList(LIB_NAME_USE "${LIB_NAMES}" ".lib")

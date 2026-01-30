@@ -1,0 +1,7 @@
+build/
+build_debug/
+Debug/
+Release/
+debug/
+release/
+res/log4/
