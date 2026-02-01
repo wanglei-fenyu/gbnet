@@ -31,8 +31,6 @@ public:
     void set_closed_callback(session_closed_callback_t call_bcak);
     void set_received_callback(session_received_callback_t call_bcak);
     void set_sent_callback(session_sent_callback_t call_bcak);
-    void set_return_io_service_pool_fun(std::function<IoServicePoolPtr()> fun);
-    const IoServicePoolPtr get_io_service_pool();
 
 public:
     void ShutDown();
@@ -55,7 +53,6 @@ private:
     session_closed_callback_t    _closed_callback;
     session_received_callback_t  _received_callback;
     session_sent_callback_t      _sent_callbcak;
-    std::function<IoServicePoolPtr()> _get_io_service_pool_fun;
 
     Asio::steady_timer           _heartbeat_timer;
     duration_t                   _heartbeat_duration;
@@ -65,12 +62,12 @@ private:
 
 struct FlowControlItem
 {
-	int token; //×ÜÊÇĞ¡ÓÚµÈÓÚ 0 
+	int token; //æ€»æ˜¯å°äºç­‰äº 0 
 	Session* session;
 	
 	FlowControlItem(int t, Session* s) : token(t), session(s) {}
 
-	//Ô½½Ó½ü0 ÓÅÏÈ¼¶Ô½¸ß
+	//è¶Šæ¥è¿‘0 ä¼˜å…ˆçº§è¶Šé«˜
 	bool operator<(const FlowControlItem& o) const 
 	{
 		return token > o.token;

@@ -24,7 +24,7 @@ public:
 
     explicit HttpClient(net::io_context& ioc);
 
-    // 协程接口
+    // 鍗忕▼鎺ュ彛
     net::awaitable<HttpResponse> GetAsync(const std::string& host,
                                      const std::string& port,
                                      const std::string& target);
@@ -35,7 +35,7 @@ public:
                                       const std::string& body,
                                       const std::string& content_type = "application/json");
 
-    // 回调接口
+    // 鍥炶皟鎺ュ彛
     void Get(const std::string& host, const std::string& port,
              const std::string& target, Callback cb);
 

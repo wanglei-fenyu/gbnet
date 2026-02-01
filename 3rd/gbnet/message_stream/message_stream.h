@@ -96,23 +96,23 @@ private:
     int64_t                 _swapped_data_size;
     int64_t                 _swapped_buffer_size;
 
-    //Á÷Á¿¿ØÖÆ
+    //æµé‡æ§åˆ¶
     FlowControllerPtr _flow_controller;
     int64_t           _max_pending_buffer_size;
 
     /**
-     * Ğ¡ÓÚ0 Ôò±íÊ¾Ã»ÓĞÏŞÖÆ
+     * å°äº0 åˆ™è¡¨ç¤ºæ²¡æœ‰é™åˆ¶
      */
     int32_t           _read_quota_token;
     int32_t           _write_quota_token;
 
     /**
-     * ·¢ÏûÏ¢Ê±ºòµÄÁÙÊ±±äÁ¿
+     * å‘æ¶ˆæ¯æ—¶å€™çš„ä¸´æ—¶å˜é‡
      */
     ReadBufferPtr _sending_message;
-    int64_t       _sent_size;                //µ±Ç°·¢ËÍÏûÏ¢µÄ´óĞ¡ (ÒÑ·¢)
+    int64_t       _sent_size;                //å½“å‰å‘é€æ¶ˆæ¯çš„å¤§å° (å·²å‘)
     const char*   _sending_data;
-    int           _sending_size;              //µ±Ç°·¢ËÍÊı¾İµÄ´óĞ¡
+    int           _sending_size;              //å½“å‰å‘é€æ•°æ®çš„å¤§å°
    
         // statistics
     int64_t _total_sent_count;
@@ -121,21 +121,21 @@ private:
     int64_t _total_received_size;
 
     /**
-     * ½ÓÊÕÏûÏ¢Ê±µÄÁÙÊ±±äÁ¿
+     * æ¥æ”¶æ¶ˆæ¯æ—¶çš„ä¸´æ—¶å˜é‡
      */
     ReadBufferPtr _receiving_message;
-    int64_t       _received_message_size;   //µ±Ç°ÒÑ½ÓÊÕµÄÏûÏ¢´óĞ¡
+    int64_t       _received_message_size;   //å½“å‰å·²æ¥æ”¶çš„æ¶ˆæ¯å¤§å°
     MessageHeader _receiving_header;
     int _received_header_size;  
-    bool _receiving_header_identified;        //Ê¶±ğ±êÖ¾
+    bool _receiving_header_identified;        //è¯†åˆ«æ ‡å¿—
 
     
     /**
-     * Êı¾İ
+     * æ•°æ®
      */
     char* _tran_buf;
-    char* _receiving_data;   //Î¬»¤ _tran_bufÆ«ÒÆµÄÖ¸Õë
-    int64_t _receiving_size; //Î¬»¤ _tran_buf¿Õ¼äµÄ´óĞ¡
+    char* _receiving_data;   //ç»´æŠ¤ _tran_bufåç§»çš„æŒ‡é’ˆ
+    int64_t _receiving_size; //ç»´æŠ¤ _tran_bufç©ºé—´çš„å¤§å°
 
 
     static const int TOKEN_FREE = 0;

@@ -71,7 +71,7 @@ inline std::error_code make_error_code(UnPackErrorType error_type)
 
 NAMESPACE_END
 
-// ½«½â°ü´íÎóÂë
+// å°†è§£åŒ…é”™è¯¯ç 
 
 namespace std
 {
@@ -309,7 +309,7 @@ private:
     template <typename T>
     void pack_type(const T &value)
     {
-        if constexpr (std::is_enum<typename std::decay<T>::type>::value) // Ã¶¾Ù
+        if constexpr (std::is_enum<typename std::decay<T>::type>::value) // æšä¸¾
         {
             pack_type((int32_t)value);
         }
@@ -436,7 +436,7 @@ private:
             break;
         case sol::type::number:
             obj.push();
-            if (lua_isinteger(obj.lua_state(), -1)) // Èç¹ûÊÇÕûÊı
+            if (lua_isinteger(obj.lua_state(), -1)) // å¦‚æœæ˜¯æ•´æ•°
             {
                 pack_type(obj.template as<int64_t>());
             }
@@ -533,7 +533,7 @@ template <>
 inline void Packer::pack_type(const int8_t &value)
 {
 	serializedObj_.emplace_back((uint8_t)format_t::int8);
-	serializedObj_.emplace_back(uint8_t(to_binary(value).to_ulong())); // ÄÃµ½Ò»¸öÓëbitset ÏàÍ¨Î»µÄÒ»¸öÊı×Ö ·½±ã´æ´¢
+	serializedObj_.emplace_back(uint8_t(to_binary(value).to_ulong())); // æ‹¿åˆ°ä¸€ä¸ªä¸bitset ç›¸é€šä½çš„ä¸€ä¸ªæ•°å­— æ–¹ä¾¿å­˜å‚¨
 }
 
 template <>
@@ -1257,7 +1257,7 @@ private:
 
         default:
         {
-            if (byte >= 0 && byte <= 31)        //32bitÖ®ÄÚ
+            if (byte >= 0 && byte <= 31)        //32bitä¹‹å†…
             {
                 uint8_t value = 0;
                 unpack_type(value);

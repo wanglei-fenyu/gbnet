@@ -11,7 +11,7 @@ void TimerManager::Update()
         auto timer = steady_timers_.top();
         if (!timer->active_) {
             steady_timers_.pop();
-            all_timers_.erase(timer->Id());  //É¾³ý
+            all_timers_.erase(timer->Id());  //åˆ é™¤
             continue;
         }
 
@@ -20,9 +20,9 @@ void TimerManager::Update()
             (*timer)();
             if (timer->IsLoop()) {
                 timer->Reset();
-                steady_timers_.push(timer); // ÖØÐÂ¼ÓÈëÑ­»·¶¨Ê±Æ÷
+                steady_timers_.push(timer); // é‡æ–°åŠ å…¥å¾ªçŽ¯å®šæ—¶å™¨
             } else {
-                all_timers_.erase(timer->Id()); // ´ÓÈ«¾Ö¹ÜÀíÖÐÉ¾³ý
+                all_timers_.erase(timer->Id()); // ä»Žå…¨å±€ç®¡ç†ä¸­åˆ é™¤
             }
         } 
         else {
@@ -44,9 +44,9 @@ void TimerManager::Update()
             (*timer)();
             if (timer->IsLoop()) {
                 timer->Reset();
-                system_timers_.push(timer); // ÖØÐÂ¼ÓÈëÑ­»·¶¨Ê±Æ÷
+                system_timers_.push(timer); // é‡æ–°åŠ å…¥å¾ªçŽ¯å®šæ—¶å™¨
             } else {
-                all_timers_.erase(timer->Id()); // ´ÓÈ«¾Ö¹ÜÀíÖÐÉ¾³ý
+                all_timers_.erase(timer->Id()); // ä»Žå…¨å±€ç®¡ç†ä¸­åˆ é™¤
             }
         } 
         else {
@@ -88,7 +88,7 @@ void TimerManager::UnRegisterTimer(int64_t timerId)
 {
 	 auto it = all_timers_.find(timerId);
         if (it != all_timers_.end()) {
-            it->second->Cancel(); //ÏÈ±ê¼ÇÎªÊ§Ð§
+            it->second->Cancel(); //å…ˆæ ‡è®°ä¸ºå¤±æ•ˆ
             //all_timers_.erase(it);
         }
 }

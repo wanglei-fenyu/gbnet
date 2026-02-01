@@ -23,22 +23,22 @@ public:
     virtual ~ReadBuffer();
 
     /**
-     * ÏòbufferÖĞÌí¼ÓbufferHandle
-     * Ç°ÌáÌõ¼ş£º
-     *      1.Ö®Ç°Ã»ÓĞµ÷ÓÃ¹ıNext()¡¢Backup()»òSkip()·½·¨
-     *      2.buf_handleµÄ´óĞ¡Ó¦¸Ã´óÓÚ0
-     *      3.read_buffer²»Ó¦¸ÃÎªNULL
+     * å‘bufferä¸­æ·»åŠ bufferHandle
+     * å‰ææ¡ä»¶ï¼š
+     *      1.ä¹‹å‰æ²¡æœ‰è°ƒç”¨è¿‡Next()ã€Backup()æˆ–Skip()æ–¹æ³•
+     *      2.buf_handleçš„å¤§å°åº”è¯¥å¤§äº0
+     *      3.read_bufferä¸åº”è¯¥ä¸ºNULL
      */
     void Append(const BufferHandle& buf_handle);
     void Append(const ReadBuffer* read_buffer);
 
-    //»ñÈ¡»º³åÇø×ÜµÄ×Ö½ÚÊı
+    //è·å–ç¼“å†²åŒºæ€»çš„å­—èŠ‚æ•°
     int64_t TotalCount() const;
 
-    //»ñÈ¡»º³åÇøÕ¼ÓÃ¿éµÄ¸öÊı
+    //è·å–ç¼“å†²åŒºå ç”¨å—çš„ä¸ªæ•°
     int BlockCount() const;
 
-    //»ñÈ¡»º³åÇøÕ¼ÓÃµÄ×Ü¿é´óĞ¡¡£
+    //è·å–ç¼“å†²åŒºå ç”¨çš„æ€»å—å¤§å°ã€‚
     int64_t TotalBlockSize() const;
 
     std::string ToString();
@@ -50,12 +50,12 @@ public:
 
 private:
     BufHandleList         _buf_list;
-    int64_t               _total_block_size; //»º³åÇø×ÜµÄ¿é´óĞ¡
-    int64_t               _total_bytes;      //»º³åÇø×Ü×Ö½Ú
-    BufHandleListIterator _cur_it;           //µ±Ç°½Úµã
+    int64_t               _total_block_size; //ç¼“å†²åŒºæ€»çš„å—å¤§å°
+    int64_t               _total_bytes;      //ç¼“å†²åŒºæ€»å­—èŠ‚
+    BufHandleListIterator _cur_it;           //å½“å‰èŠ‚ç‚¹
     int                   _cur_pos;
-    int                   _last_bytes; //×îºó¶ÁÈ¡µÄ×Ö½ÚÊı
-    int64_t               _read_bytes; //×Ü¹²¶ÁÈ¡µÄ×Ö½ÚÊı
+    int                   _last_bytes; //æœ€åè¯»å–çš„å­—èŠ‚æ•°
+    int64_t               _read_bytes; //æ€»å…±è¯»å–çš„å­—èŠ‚æ•°
 
     NON_COPYABLE(ReadBuffer);
 };
@@ -76,15 +76,15 @@ public:
 
 
     /**
-     * ´ÓWritebuffer(Êä³öÁ÷)È¡³öÊı¾İ£¬½«ÆäĞ´Èëµ½ReadBuffer(ÊäÈëÁ÷)
-     * Ö´ĞĞÍêÖ®ºó WriteBuffer»á±»Çå¿Õ  ¾ÍÏñÒ»¸öÈ«ĞÂµÄWriteBuffer
+     * ä»Writebuffer(è¾“å‡ºæµ)å–å‡ºæ•°æ®ï¼Œå°†å…¶å†™å…¥åˆ°ReadBuffer(è¾“å…¥æµ)
+     * æ‰§è¡Œå®Œä¹‹å WriteBufferä¼šè¢«æ¸…ç©º  å°±åƒä¸€ä¸ªå…¨æ–°çš„WriteBuffer
      */
     void SwapOut(ReadBuffer* is);
 
     /**
-     * ÔÚ»º³åÇøÖĞ±£ÁôÒ»Ğ©¿Õ¼ä¡£
-     * ³É¹¦£¬·µ»ØÔ¤Áô¿Õ¼äµÄÍ·²¿Î»ÖÃ¡£
-     * Ê§°Ü£¬·µ»Ø-1¡£
+     * åœ¨ç¼“å†²åŒºä¸­ä¿ç•™ä¸€äº›ç©ºé—´ã€‚
+     * æˆåŠŸï¼Œè¿”å›é¢„ç•™ç©ºé—´çš„å¤´éƒ¨ä½ç½®ã€‚
+     * å¤±è´¥ï¼Œè¿”å›-1ã€‚
      */
     int64_t Reserve(int count);
 
@@ -103,16 +103,16 @@ public:
     size_t base_block_factor();
 
 private:
-    // ÔÚÕâ¸öbuffer½áÎ²ÍØÕ¹Ò»¸öĞÂµÄÄÚ´æ¿é
+    // åœ¨è¿™ä¸ªbufferç»“å°¾æ‹“å±•ä¸€ä¸ªæ–°çš„å†…å­˜å—
     bool Extend();
 
 private:
     BufHandleList _buf_list;
-    int64_t       _total_block_size;  //»º³åÇøÖĞµÄ×Ü¿é´óĞ¡
-    int64_t       _total_capacity;    //»º³åÇøÖĞµÄ×ÜÈİÁ¿
-    int           _last_bytes;        //×îºóĞ´ÈëµÄ×Ö½ÚÊı
-    int64_t       _write_bytes;       //×Ü¹²Ğ´ÈëµÄ×Ö½ÚÊı
-    size_t        _base_block_factor; //ÄÚ´æ¿éÅòÕÍÒò×Ó
+    int64_t       _total_block_size;  //ç¼“å†²åŒºä¸­çš„æ€»å—å¤§å°
+    int64_t       _total_capacity;    //ç¼“å†²åŒºä¸­çš„æ€»å®¹é‡
+    int           _last_bytes;        //æœ€åå†™å…¥çš„å­—èŠ‚æ•°
+    int64_t       _write_bytes;       //æ€»å…±å†™å…¥çš„å­—èŠ‚æ•°
+    size_t        _base_block_factor; //å†…å­˜å—è†¨èƒ€å› å­
 
     NON_COPYABLE(WriteBuffer);
 };

@@ -1,8 +1,7 @@
 #include "MyApp.h"
+#include "network/net_manager/network_manager.h"
 #include "test.h"
-#include "network.h"
 #include "common/res_path.h"
-
 static bool is_net_init = false;
 
 
@@ -31,16 +30,15 @@ int MyApp::OnInit()
     gb::ClientOptions options;
     options.keep_alive_time = -1;
     client_.reset(new gb::Client(options));
+    gb::NetworkManager::Instance()->Init(client_.get());
+    
     Test_Register();
-
+    
 	client_->SetCloseCallBack([](const gb::SessionPtr session) {
         LOG_INFO("net close");
     });
 
 	client_->SetConnnectCallBack([this](const gb::SessionPtr session) {
-        session->set_return_io_service_pool_fun([&]()-> gb::IoServicePoolPtr {
-            return client_->GetIoServicePool();
-        });
         LOG_INFO("net connect");
         is_net_init = true;
         //session->StartHeartbeat(std::chrono::seconds(2));
@@ -73,7 +71,6 @@ int MyApp::OnInit()
     });
 
     
-	client_->SetReceivedCallBack(gb::OnReceiveCall);
 
 	auto [ip, port] = AppTypeMgr::Instance()->GetServerIpPort();
 	std::string uir = ip + ":" + port;

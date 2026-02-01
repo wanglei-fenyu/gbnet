@@ -2,6 +2,7 @@
 #include "../../common/timer_help.h"
 #include "../../common/worker/worker_manager.h"
 #include "log/log_help.h"
+#include "../net_manager/network_manager.h"
 namespace gb
 {
 extern void RpcCancel(int64_t seq_id);
@@ -68,7 +69,7 @@ void RpcCall::Cancel()
 	auto worker = WorkerManager::Instance()->GetWorker(Id.index);
 	if (worker)
 	{
-		worker->Post([self = shared_from_this()]() { RpcCancel(self->GetId()); });
+		worker->Post([self = shared_from_this()]() { gb::NetworkManager::Instance()->RpcCancel(self->GetId()); });
 	}
 }
 
@@ -88,7 +89,7 @@ bool RpcCall::HasSession()
 
 void RpcCall::Done(const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) const
 {
-    // È¡Ïû¶¨Ê±Æ÷
+    // å–æ¶ˆå®šæ—¶å™¨
     if (timer_ && timer_->expiry() > std::chrono::steady_clock::now())
     {
         timer_->cancel();

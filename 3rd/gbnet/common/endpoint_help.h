@@ -11,21 +11,21 @@ namespace gb
 	uint32_t PortOfEndpoint(const Endpoint& endpoint);
 
 
-	// ½«·şÎñÆ÷µØÖ·½âÎöÎª endpoint_t£¬½öÑ¡ÔñµÚÒ»¸ö¡£
-	// @param io_service ÊÇÓÃÓÚ½âÎöµÄ IO ·şÎñ¡£
-	// @param host ¿ÉÒÔÊÇ IP »òÖ÷»úÃû£¬ÀıÈç "127.0.0.1" »ò "baidu.com"¡£
-	// @param svc ¿ÉÒÔÊÇ¶Ë¿Ú»ò·şÎñÃû³Æ£¬ÀıÈç "21" »ò "ftp"¡£
-	// @param endpoints ÊÇÊä³ö²ÎÊı£¬Èç¹û½âÎö³É¹¦£¬Ôò´æ´¢½âÎöµÄ endpoint_t£¬µ«¿ÉÄÜÎª¿Õ¡£
-	// @return Èç¹û½âÎö³É¹¦£¬Ôò·µ»Ø true¡£
-	// @return Èç¹û½âÎöÊ§°Ü£¬Ôò·µ»Ø false¡£
+	// å°†æœåŠ¡å™¨åœ°å€è§£æä¸º endpoint_tï¼Œä»…é€‰æ‹©ç¬¬ä¸€ä¸ªã€‚
+	// @param io_service æ˜¯ç”¨äºè§£æçš„ IO æœåŠ¡ã€‚
+	// @param host å¯ä»¥æ˜¯ IP æˆ–ä¸»æœºåï¼Œä¾‹å¦‚ "127.0.0.1" æˆ– "baidu.com"ã€‚
+	// @param svc å¯ä»¥æ˜¯ç«¯å£æˆ–æœåŠ¡åç§°ï¼Œä¾‹å¦‚ "21" æˆ– "ftp"ã€‚
+	// @param endpoints æ˜¯è¾“å‡ºå‚æ•°ï¼Œå¦‚æœè§£ææˆåŠŸï¼Œåˆ™å­˜å‚¨è§£æçš„ endpoint_tï¼Œä½†å¯èƒ½ä¸ºç©ºã€‚
+	// @return å¦‚æœè§£ææˆåŠŸï¼Œåˆ™è¿”å› trueã€‚
+	// @return å¦‚æœè§£æå¤±è´¥ï¼Œåˆ™è¿”å› falseã€‚
     bool ResolveAddress(IoService& io_service, const std::string& host, const std::string& svc, Endpoint* endpoint);
 
-	// ½«·şÎñÆ÷µØÖ·½âÎöÎª endpoint_t£¬½öÑ¡ÔñµÚÒ»¸ö¡£
-	// @param io_service ÊÇÓÃÓÚ½âÎöµÄ IO ·şÎñ¡£
-	// @param server address Ó¦Îª "host:port" ¸ñÊ½¡£
-	// @param endpoint ÊÇÊä³ö²ÎÊı£¬Èç¹û½âÎö³É¹¦£¬Ôò´æ´¢½âÎöµÄ endpoint_t¡£
-	// @return Èç¹û½âÎö³É¹¦£¬Ôò·µ»Ø true¡£
-	// @return Èç¹û½âÎöÊ§°Ü»òÎ´ÕÒµ½µØÖ·£¬Ôò·µ»Ø false¡£
+	// å°†æœåŠ¡å™¨åœ°å€è§£æä¸º endpoint_tï¼Œä»…é€‰æ‹©ç¬¬ä¸€ä¸ªã€‚
+	// @param io_service æ˜¯ç”¨äºè§£æçš„ IO æœåŠ¡ã€‚
+	// @param server address åº”ä¸º "host:port" æ ¼å¼ã€‚
+	// @param endpoint æ˜¯è¾“å‡ºå‚æ•°ï¼Œå¦‚æœè§£ææˆåŠŸï¼Œåˆ™å­˜å‚¨è§£æçš„ endpoint_tã€‚
+	// @return å¦‚æœè§£ææˆåŠŸï¼Œåˆ™è¿”å› trueã€‚
+	// @return å¦‚æœè§£æå¤±è´¥æˆ–æœªæ‰¾åˆ°åœ°å€ï¼Œåˆ™è¿”å› falseã€‚
     bool ResolveAddress(IoService& io_service, const std::string& address, Endpoint* endpoint);
 
    } // namespace gb

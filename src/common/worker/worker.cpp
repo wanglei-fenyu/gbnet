@@ -26,10 +26,10 @@ void Worker::Init(uint32_t id, size_t index)
 void Worker::OnStart()
 {
     LOG_INFO("Start");
-    runing_.store(true);  //Æô¶¯Ïß³ÌÁË
-	//×¢²áÏûÏ¢¼àÌý
+    runing_.store(true);  //å¯åŠ¨çº¿ç¨‹äº†
+	//æ³¨å†Œæ¶ˆæ¯ç›‘å¬
 
-	//¼ÓÔØ½Å±¾
+	//åŠ è½½è„šæœ¬
     InitLua();
 }   
 
@@ -110,7 +110,7 @@ void Worker::InitLua()
 	if (!scriptPtr_)
 		return;
 	scriptPtr_->open_libraries(lib::base, lib::package,lib::string,lib::table,lib::os,lib::bit32,lib::coroutine,lib::count,lib::debug,lib::ffi,lib::io,lib::jit,lib::math,lib::utf8);
-	//×¢²á½Å±¾ 
+	//æ³¨å†Œè„šæœ¬ 
 	register_script(scriptPtr_);
     sol::function require = (*scriptPtr_)["require"];
 #ifdef MY_DEBUG_MODE
@@ -122,7 +122,7 @@ void Worker::InitLua()
 #if ENGINE_PLATFORM != PLATFORM_WIN32	
     _lua_socket += "?.so";
 #endif
-    //¼ÓÔØluasocket
+    //åŠ è½½luasocket
     std::string package_cpath = (*scriptPtr_)["package"]["cpath"].get<std::string>();
     (*scriptPtr_)["package"]["cpath"] = package_cpath + ";" + _lua_socket;
     require("socket.core");
@@ -133,7 +133,7 @@ void Worker::InitLua()
 	std::string package_path = (*scriptPtr_)["package"]["path"];
     package_path += ";" + script_path + "/?.lua";
     (*scriptPtr_)["package"]["path"] = package_path;
-    //Æô¶¯µ÷ÊÔ
+    //å¯åŠ¨è°ƒè¯•
     auto result = scriptPtr_->safe_script_file(script_path + "/start_debug.lua");
     if (!result.valid()) {
         sol::error err = result;

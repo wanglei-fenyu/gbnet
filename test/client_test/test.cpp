@@ -1,5 +1,4 @@
 ﻿#include "test.h"
-#include "network.h"
 #include "network/http/http_client.h"
 void hello(TestMsg& msg)
 {
@@ -8,7 +7,7 @@ void hello(TestMsg& msg)
 
 void Test_Register()
 {
-    gb::Listen(1, 2, hello);
+    gb::NetworkManager::Instance()->Listen(1, 2, hello);
 }
 
 void SendMsg1(std::shared_ptr<gb::Client> client)
@@ -36,7 +35,7 @@ void SendRpc(std::shared_ptr<gb::Client> client)
 	call->SetCallBack([](int a,std::string str) {
 		LOG_INFO("test lua reply: {} {}",a, str);
 	});
-	gb::Call(call, "test_ret_args", 2, "asadsadsadsdaefasgajf中国人大大撒大苏打 ddbgasufgsajbasadsadsadsdaefasgajf中国人大大撒大苏打 ddbgasufgsajbfasvfafasvfa");
+    gb::NetworkManager::Instance()->Call(call, "test_ret_args", 2, "asadsadsadsdaefasgajf中国人大大撒大苏打 ddbgasufgsajbasadsadsadsdaefasgajf中国人大大撒大苏打 ddbgasufgsajbfasvfafasvfa");
 	
 }
 

@@ -8,7 +8,7 @@
 namespace gb
 {
 
-constexpr int64_t kRpcdefaultTimeout = 1000 * 5; //5Ãë
+constexpr int64_t kRpcdefaultTimeout = 1000 * 5; //5ç§’
 
 typedef rpc_listen_fun rpc_done_call;
 
@@ -57,16 +57,16 @@ private:
     void StartTimer();
 
 private:
-    uint64_t                  id_;             //Î¨Ò»±êÊ¶
-    //std::chrono::milliseconds timeout_;        //³¬Ê±Ê±¼ä
-    //int64_t                   timer_id_;       //¼ÆÊ±Æ÷id
+    uint64_t                  id_;             //å”¯ä¸€æ ‡è¯†
+    //std::chrono::milliseconds timeout_;        //è¶…æ—¶æ—¶é—´
+    //int64_t                   timer_id_;       //è®¡æ—¶å™¨id
     mutable std::optional<Asio::steady_timer> timer_;
-    std::chrono::steady_clock::duration timeout_;       //Ê¹ÓÃºÁÃë
-    std::function<void()>     timeout_func_;   //³¬Ê±»Øµ÷
-    bool                      is_cancel_;      //ÊÇ·ñÒÑ¾­È¡Ïû
-    std::shared_ptr<Session>  session_;        //ÍøÂç»á»°
-    rpc_done_call             done_call_bcak_; //»Øµ÷º¯Êı
-    RpcErrorCode              error_code_;     //´íÎóÂë
+    std::chrono::steady_clock::duration timeout_;       //ä½¿ç”¨æ¯«ç§’
+    std::function<void()>     timeout_func_;   //è¶…æ—¶å›è°ƒ
+    bool                      is_cancel_;      //æ˜¯å¦å·²ç»å–æ¶ˆ
+    std::shared_ptr<Session>  session_;        //ç½‘ç»œä¼šè¯
+    rpc_done_call             done_call_bcak_; //å›è°ƒå‡½æ•°
+    RpcErrorCode              error_code_;     //é”™è¯¯ç 
 };
 
 template <class F>

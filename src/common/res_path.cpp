@@ -9,7 +9,7 @@
 
 ResPath::ResPath()
 {
-    // 获取引擎环境配置
+    // 鑾峰彇寮曟搸鐜閰嶇疆
 #if ENGINE_PLATFORM != PLATFORM_WIN32		
     char* envValue = getenv("GENGINE_RES_PATH");
     _resPath = envValue == nullptr ? "" : envValue;
@@ -23,7 +23,7 @@ ResPath::ResPath()
     }
 #endif
 
-    // 默认路径
+    // 榛樿璺緞
     if (_resPath.empty())
     {
 #if ENGINE_PLATFORM != PLATFORM_WIN32		
@@ -44,7 +44,7 @@ ResPath::ResPath()
             _resPath = _resPath.substr(0, index);
         }
 #else
-        // window下的目录必须是全英文
+        // window涓嬬殑鐩綍蹇呴』鏄叏鑻辨枃
         char name[PATH_MAX];
         ZeroMemory(name, PATH_MAX);
         const DWORD rslt = GetModuleFileNameA(nullptr, name, MAX_PATH);

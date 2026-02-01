@@ -46,7 +46,7 @@ void ClientImpl::Start()
     _io_service_pool->Run();
 
     _maintain_thread.reset(new IoWorker());
-    _maintain_thread->Run();  //�����ؽű�
+    _maintain_thread->Run();  //²»¼ÓÔØ½Å±¾
 
 	_timer_worker.reset(new TimerWorker(_maintain_thread->GetIoContext()));
     _timer_worker->set_time_duration(std::chrono::milliseconds(MAINTAIN_INTERVAL_IN_MS));

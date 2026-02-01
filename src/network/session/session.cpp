@@ -69,7 +69,7 @@ void Session::Send(const Meta* meta)
 	int64_t       header_pos = write_buffer.Reserve(header_size);
     if (meta == nullptr)
     {
-        //¿ÕÏûÏ¢Ö»ÓĞÍ·  ĞÄÌø°ü
+        //ç©ºæ¶ˆæ¯åªæœ‰å¤´  å¿ƒè·³åŒ…
 		write_buffer.SetData(header_pos, reinterpret_cast<const char*>(&header), header_size);
     }
     else
@@ -349,19 +349,6 @@ void Session::set_sent_callback(session_sent_callback_t call_bcak)
     _sent_callbcak = call_bcak;
 }
 
-
-
-void Session::set_return_io_service_pool_fun(std::function<IoServicePoolPtr()> fun)
-{
-    _get_io_service_pool_fun = fun;
-}
-
-const IoServicePoolPtr  Session::get_io_service_pool()
-{
-    if (_get_io_service_pool_fun)
-		return _get_io_service_pool_fun();
-    return nullptr;
-}
 
 void Session::ShutDown()
 {

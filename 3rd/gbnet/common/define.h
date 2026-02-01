@@ -39,7 +39,7 @@ enum class NET_TYPE :int8_t
 {
     NT_SERVER = 0,
     NT_CLIENT = 1,
-    NT_NATS   = 2,        //ÏûÏ¢ÖÐ¼ä¼þ
+    NT_NATS   = 2,        //æ¶ˆæ¯ä¸­é—´ä»¶
 };
 
 enum class CONNECT_TYPE :int8_t
@@ -82,7 +82,7 @@ enum NET_ErrorCode {
 }; 
 
 
-//ÊÇ·ñÊ¹ÓÃ×ÊÔ´¼ÆÊý
+//æ˜¯å¦ä½¿ç”¨èµ„æºè®¡æ•°
 #define USE_RESOURCE_COUNTER true
 
 #ifdef USE_RESOURCE_COUNTER
@@ -105,13 +105,13 @@ enum NET_ErrorCode {
 
 #else
 
-#    define DEF_RESOURCE_COUNTER(name) // ¿Õ¶¨Òå
+#    define DEF_RESOURCE_COUNTER(name) // ç©ºå®šä¹‰
 
-#    define RESOURCE_COUNTER_INC(name) // ¿Õ¶¨Òå
+#    define RESOURCE_COUNTER_INC(name) // ç©ºå®šä¹‰
 
-#    define RESOURCE_COUNTER_DEC(name) // ¿Õ¶¨Òå
+#    define RESOURCE_COUNTER_DEC(name) // ç©ºå®šä¹‰
 
-#    define GET_RESOURCE_COUNTER(name) 0 // ·µ»Ø0£¬±íÊ¾¼ÆÊýÆ÷Î´¶¨Òå
+#    define GET_RESOURCE_COUNTER(name) 0 // è¿”å›ž0ï¼Œè¡¨ç¤ºè®¡æ•°å™¨æœªå®šä¹‰
 
 #endif
 
@@ -120,7 +120,7 @@ DEF_RESOURCE_COUNTER(SSLByteStream);
 DEF_RESOURCE_COUNTER(Listener);
 
 
-//ÊÇ·ñÊ¹ÓÃÍøÂçÈÕÖ¾
+//æ˜¯å¦ä½¿ç”¨ç½‘ç»œæ—¥å¿—
 #define USE_NETWORK_LOG_TRACK true
 
 #if USE_NETWORK_LOG_TRACK   

@@ -1,6 +1,7 @@
 #pragma once
 #include "app/app.h"
 #include "network/net/client.h"
+#include "network/net_manager/network_manager.h"
 
 class MyApp :public App
 {

@@ -10,7 +10,7 @@
 #include "spdlog/spdlog.h"
 #include <stdarg.h>
 
-//ÈÕÖ¾Ãû³Æ
+//æ—¥å¿—åç§°
 #define LOG_NAME "multi_sink"
 #define LOGGER_INSTANCE() spdlog::get(LOG_NAME)
 #define LOG_TRACE(...)    SPDLOG_LOGGER_CALL(LOGGER_INSTANCE(), spdlog::level::trace, __VA_ARGS__)
@@ -38,19 +38,19 @@
 class GbLog
 {
 public:
-	//ÈÕÖ¾Êä³öÎ»ÖÃ
+	//æ—¥å¿—è¾“å‡ºä½ç½®
 	enum OutPosition {
-		CONSOLE = 0x01,	//¿ØÖÆÌ¨
-		FILE = 0X02,	//ÎÄ¼ş
-		CONSOLE_AND_FILE = 0x03, //¿ØÖÆÌ¨+ÎÄ¼ş
+		CONSOLE = 0x01,	//æ§åˆ¶å°
+		FILE = 0X02,	//æ–‡ä»¶
+		CONSOLE_AND_FILE = 0x03, //æ§åˆ¶å°+æ–‡ä»¶
 	};
 
 	enum OutMode {
-		SYNC,	//Í¬²½Ä£Ê½
-		ASYNC,	//Òì²½Ä£Ê½
+		SYNC,	//åŒæ­¥æ¨¡å¼
+		ASYNC,	//å¼‚æ­¥æ¨¡å¼
 	};
 
-	//ÈÕÖ¾Êä³öµÈ¼¶
+	//æ—¥å¿—è¾“å‡ºç­‰çº§
 	enum OutLevel {
 		LEVEL_TRACE = 0,
 		LEVEL_DEBUG = 1,
@@ -65,13 +65,13 @@ public:
 	GbLog();
 	~GbLog();
 
-	/* func: ³õÊ¼»¯ÈÕÖ¾Í¨µÀ
-	* @para[in] nFileName    : ÈÕÖ¾´æ´¢Â·¾¶			£¨Ö§³ÖÏà¶ÔÂ·¾¶ºÍ¾ø¶ÔÂ·¾¶£©
-	* @para[in] nMaxFileSize : ÈÕÖ¾ÎÄ¼ş×î´ó´æ´¢´óĞ¡	£¨Ä¬ÈÏ1024*1024*10£©
-	* @para[in] nMaxFile     : ×î¶à´æ´¢¶àÉÙ¸öÈÕÖ¾ÎÄ¼ş	£¨Ä¬ÈÏ10£¬³¬¹ı×î´óÖµÔòÑ­»·¸²¸Ç£©
-	* @para[in] outMode      : ÈÕÖ¾Êä³öÄ£Ê½			£¨Í¬²½¡¢Òì²½£©
-	* @para[in] outPos       : ÈÕÖ¾Êä³öÎ»ÖÃ			£¨¿ØÖÆÌ¨¡¢ÎÄ¼ş¡¢¿ØÖÆÌ¨+ÎÄ¼ş£©
-	* @para[in] outLevel     : ÈÕÖ¾Êä³öµÈ¼¶			£¨Ö»Êä³ö>=µÈ¼¶µÄÈÕÖ¾ÏûÏ¢£©
+	/* func: åˆå§‹åŒ–æ—¥å¿—é€šé“
+	* @para[in] nFileName    : æ—¥å¿—å­˜å‚¨è·¯å¾„			ï¼ˆæ”¯æŒç›¸å¯¹è·¯å¾„å’Œç»å¯¹è·¯å¾„ï¼‰
+	* @para[in] nMaxFileSize : æ—¥å¿—æ–‡ä»¶æœ€å¤§å­˜å‚¨å¤§å°	ï¼ˆé»˜è®¤1024*1024*10ï¼‰
+	* @para[in] nMaxFile     : æœ€å¤šå­˜å‚¨å¤šå°‘ä¸ªæ—¥å¿—æ–‡ä»¶	ï¼ˆé»˜è®¤10ï¼Œè¶…è¿‡æœ€å¤§å€¼åˆ™å¾ªç¯è¦†ç›–ï¼‰
+	* @para[in] outMode      : æ—¥å¿—è¾“å‡ºæ¨¡å¼			ï¼ˆåŒæ­¥ã€å¼‚æ­¥ï¼‰
+	* @para[in] outPos       : æ—¥å¿—è¾“å‡ºä½ç½®			ï¼ˆæ§åˆ¶å°ã€æ–‡ä»¶ã€æ§åˆ¶å°+æ–‡ä»¶ï¼‰
+	* @para[in] outLevel     : æ—¥å¿—è¾“å‡ºç­‰çº§			ï¼ˆåªè¾“å‡º>=ç­‰çº§çš„æ—¥å¿—æ¶ˆæ¯ï¼‰
 	*/
 	bool Init(const char* nFileName, const int nMaxFileSize = 1024 * 1024 * 10, const int nMaxFile = 10,
 		const OutMode outMode = SYNC, const OutPosition outPos = CONSOLE_AND_FILE, const OutLevel outLevel = LEVEL_TRACE);

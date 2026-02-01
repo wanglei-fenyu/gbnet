@@ -54,10 +54,10 @@ void Test_Register()
 	for (auto w : wm->GetWorkers())
 	{
         w->Post([]() {
-			gb::Register("test_rpc", test_rpc);
-			gb::Register("test_rpc2", test_rpc2);
-			gb::Register("square", square);
-			gb::Register("test_ret_args", test_ret_args);
+			gb::NetworkManager::Instance()->Register("test_rpc", test_rpc);
+            gb::NetworkManager::Instance()->Register("test_rpc2", test_rpc2);
+            gb::NetworkManager::Instance()->Register("square", square);
+            gb::NetworkManager::Instance()->Register("test_ret_args", test_ret_args);
         });
 	}
 }

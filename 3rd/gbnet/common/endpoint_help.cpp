@@ -26,7 +26,7 @@ bool ResolveAddress(IoService& io_service, const std::string& host, const std::s
     Resolver   resolver(io_service);
     Error_code ec;
 
-    // Ê¹ÓÃ resolve ·½·¨À´½âÎö
+    // ä½¿ç”¨ resolve æ–¹æ³•æ¥è§£æ
     auto result = resolver.resolve(host, svc, ec);
 
     if (ec)
@@ -35,10 +35,10 @@ bool ResolveAddress(IoService& io_service, const std::string& host, const std::s
         return false;
     }
 
-    // »ñÈ¡µÚÒ»¸ö½âÎö½á¹û²¢·µ»Ø
+    // è·å–ç¬¬ä¸€ä¸ªè§£æç»“æœå¹¶è¿”å›
     if (result.begin() != result.end())
     {
-        *endpoint = result.begin()->endpoint(); // »ñÈ¡µÚÒ»¸ö½âÎöµÄ¶Ëµã
+        *endpoint = result.begin()->endpoint(); // è·å–ç¬¬ä¸€ä¸ªè§£æçš„ç«¯ç‚¹
         return true;
     }
 

@@ -4,23 +4,23 @@ namespace gb
 {
 	void GetMsgData(Meta& meta, ReadBufferPtr buffer, int meta_size, int64_t data_size, std::string& out_s)
 	{
-		std::string s = buffer->ToString(); // Ô­Ê¼×Ö·û´®¿½±´
+		std::string s = buffer->ToString(); // åŸå§‹å­—ç¬¦ä¸²æ‹·è´
 
 		if ((CompressType)meta.compress_type() == CompressType::CompressTypeNone)
 		{
-			// ¶ÔÓÚÎ´Ñ¹ËõµÄÊı¾İ£¬Ö±½Ó½ØÈ¡ĞèÒªµÄ²¿·Ö
+			// å¯¹äºæœªå‹ç¼©çš„æ•°æ®ï¼Œç›´æ¥æˆªå–éœ€è¦çš„éƒ¨åˆ†
 			out_s = s.substr(meta_size, data_size);
 		}
 		else
 		{
-			// ¶ÔÓÚÑ¹ËõµÄÊı¾İ£¬Ê¹ÓÃ protobuf ½âÂë
+			// å¯¹äºå‹ç¼©çš„æ•°æ®ï¼Œä½¿ç”¨ protobuf è§£ç 
 			google::protobuf::io::ArrayInputStream         i(s.data() + meta_size, data_size);
 			std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(&i, (CompressType)(CompressType)meta.compress_type()));
 			google::protobuf::io::CodedInputStream         c(is.get());
 			uint32_t                                       size;
 			c.ReadVarint32(&size);
 
-			// ½âÂë×Ö·û´®²¢½«Æä´æ´¢ÔÚ´«ÈëµÄout_sÖĞ
+			// è§£ç å­—ç¬¦ä¸²å¹¶å°†å…¶å­˜å‚¨åœ¨ä¼ å…¥çš„out_sä¸­
 			c.ReadString(&out_s, size);
 		}
 	}

@@ -1,32 +1,36 @@
 #include "script.h"
 #include "register_script.h"
-#include "../network/network.h"
 #include "../network/msgpack/msgpack.hpp"
 #include "../network/session/session.h"
+#include "../network/net_manager/network_manager.h"
 #include "log/log_help.h"
 #include <filesystem>
 using namespace gb;
 static void register_net(std::shared_ptr<Script>& scriptPtr)
 {
 	auto network		= scriptPtr->create_table("net");
-	network["Listen"]	= [](int type, int id, sol::function  f,std::string protoName = "") {  gb::Listen(type, id, f, protoName); };
-	network["UnListen"] = [](int type, int id, std::string signal, int level = 0) { gb::UnListen(type, id, signal, level); };
+	network["Listen"]	= [](int type, int id, sol::function  f,std::string protoName = "") {  gb::NetworkManager::Instance()->Listen(type, id, f, protoName); };
+	network["UnListen"] = [](int type, int id, std::string signal, int level = 0) { gb::NetworkManager::Instance()->UnListen(type, id, signal, level); };
     network["Send"]     = sol::overload([](Session* session, int type, int id, std::string protoName, sol::object lua_msg) {
 											google::protobuf::Message* messgae = lua_msg.as<google::protobuf::Message*>();
 											if (messgae)
 											{
-												gb::Send(session, type, id, *messgae);
+                                                gb::NetworkManager::Instance()->Send(session, type, id, *messgae);
 											}
 										},
 										[](std::shared_ptr<Session> session, int type, int id, std::string protoName, sol::object lua_msg) {
                                         google::protobuf::Message* messgae = lua_msg.as<google::protobuf::Message*>();
 											if (messgae)
 											{
-												gb::Send(session, type, id, *messgae);
+												gb::NetworkManager::Instance()->Send(session, type, id, *messgae);
 											}
 										});
-	network["Register"]	= [](std::string method, sol::function f) { gb::Register(method, f); };
-	network["Call"]		= [](RpcCallPtr call,std::string method,sol::variadic_args args) {gb::Call(call, method, args);};
+    network["Register"] = [](std::string method, sol::function f) {
+        gb::NetworkManager::Instance()->Register(method, f);
+    };
+    network["Call"] = [](RpcCallPtr call, std::string method, sol::variadic_args args) {
+        gb::NetworkManager::Instance()->Call(call, method, args);
+    };
 
 
 	scriptPtr->new_usertype<Session>("Session");

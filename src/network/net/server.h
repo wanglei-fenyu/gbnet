@@ -2,27 +2,28 @@
 #include "listener.h"
 #include "common/define.h"
 #include "../timer_worker/timer_worker.h"
+#include "handle_interface.h"
 namespace gb
 {
 
 struct ServerOptions
 {
-    //int work_thread_num;        //ÍøÂç´¦ÀíÏß³ÌÊı
-    int max_connection_count;   //ÔÊĞíµÄ×î´óÁ¬½ÓÊıÁ¿  -1Ã»ÓĞÏŞÖÆ
-    int keep_alive_time;        //±£³ÖÁ¬½ÓµÄÊ±¼ä -1Ã»ÓĞÏŞÖÆ
-    int max_pending_buffer_size;//Ò»¸öÁ¬½ÓµÈ´ı·¢ËÍ¶ÓÁĞ×î´ó»º³åÇø µ¥Î»MB  0±íÊ¾Ã»ÓĞ»º³åÇø Ä¬ÈÏ100MB
+    //int work_thread_num;        //ç½‘ç»œå¤„ç†çº¿ç¨‹æ•°
+    int max_connection_count;   //å…è®¸çš„æœ€å¤§è¿æ¥æ•°é‡  -1æ²¡æœ‰é™åˆ¶
+    int keep_alive_time;        //ä¿æŒè¿æ¥çš„æ—¶é—´ -1æ²¡æœ‰é™åˆ¶
+    int max_pending_buffer_size;//ä¸€ä¸ªè¿æ¥ç­‰å¾…å‘é€é˜Ÿåˆ—æœ€å¤§ç¼“å†²åŒº å•ä½MB  0è¡¨ç¤ºæ²¡æœ‰ç¼“å†²åŒº é»˜è®¤100MB
 
-    //ÍøÂçÍÌÍÂ -1±íÊ¾Ã»ÓĞÏŞÖÆ
+    //ç½‘ç»œåå -1è¡¨ç¤ºæ²¡æœ‰é™åˆ¶
     int max_throughput_in;
     int max_throughput_out;
     
-    size_t io_service_pool_size; //Êµ¼ÊÍøÂç´¦ÀíÏß³ÌÊı
+    size_t io_service_pool_size; //å®é™…ç½‘ç»œå¤„ç†çº¿ç¨‹æ•°
 
-    //Ò»¸ö»ù±¾¿é64B  Ä¬ÈÏÊÇ4  Ê±¼äÄÚ´æ´óĞ¡  64<<4 1024B
+    //ä¸€ä¸ªåŸºæœ¬å—64B  é»˜è®¤æ˜¯4  æ—¶é—´å†…å­˜å¤§å°  64<<4 1024B
     size_t write_buffer_base_block_factor;
     size_t read_buffer_base_block_factor;  
     
-    bool no_delay;  //Ä¬ÈÏtrue  
+    bool no_delay;  //é»˜è®¤true  
 
 	ServerOptions()
 	//: work_thread_num(8)
@@ -43,7 +44,7 @@ struct ServerOptions
 class ServerImpl :public std::enable_shared_from_this<ServerImpl>
 {
 public:
-    static const int MAINTAIN_INTERVAL_IN_MS = 100;     //Î¬»¤¼ä¸ô 100ms
+    static const int MAINTAIN_INTERVAL_IN_MS = 100;     //ç»´æŠ¤é—´éš” 100ms
 
 public:
     ServerImpl(const ServerOptions& options);
@@ -70,7 +71,7 @@ public:
 
 public:
     void SetReceivedCallBack(Session::session_received_callback_t callback);
-    void SetAcceptCallBack(Session::session_connected_callback_t callback);
+    void SetConnnectCallBack(Session::session_connected_callback_t callback);
     void SetCloseCallBack(Session::session_closed_callback_t callback);
 
 private:
@@ -130,7 +131,7 @@ private:
 };
 
 
-class Server
+class Server : public HandleInterface
 {
 
 public:
@@ -148,9 +149,9 @@ public:
 
     const std::shared_ptr<ServerImpl>& impl(); 
     
-    void SetReceivedCallBack(Session::session_received_callback_t callback);
-    void SetAcceptCallBack(Session::session_connected_callback_t callback);
-    void SetCloseCallBack(Session::session_closed_callback_t callback);
+    virtual void SetReceivedCallBack(Session::session_received_callback_t callback) override;
+    virtual void SetConnnectCallBack(Session::session_connected_callback_t callback) override;
+    virtual void SetCloseCallBack(Session::session_closed_callback_t callback) override;
     
     IoServicePoolPtr GetIoServicePool();
 

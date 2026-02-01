@@ -2,6 +2,7 @@
 #include "app/app.h"
 #include "common/worker/worker.h"
 #include "log/log_help.h"
+#include "network/net/server.h"
 #define  SERVER_APP true
 class MyApp :public App
 {
@@ -25,6 +26,8 @@ private:
     std::thread http_thread;
     //gb::http::HttpServerPtr http_server;
     GbLog                log;
+
+    std::unique_ptr<gb::Server> server_;
 
 };
 

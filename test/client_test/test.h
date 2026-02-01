@@ -5,10 +5,9 @@
 #include "async_simple/coro/SyncAwait.h"
 #include "async_simple/executors/SimpleExecutor.h"
 #include "network/session/session.h"
-#include "network/network.h"
 #include "log/log_help.h"
-#include "network.h"
 #include "network/net/client.h"
+#include "network/net_manager/network_manager.h"
 void hello(TestMsg& msg);
 
 //async_simple::coro::Lazy<> test_coro(gb::SessionPtr& session)

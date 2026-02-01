@@ -45,7 +45,7 @@ bool ServerImpl::Start(std::string_view server_address)
     _io_service_pool->Run();
 
     _maintain_thread.reset(new IoWorker());
-    _maintain_thread->Run();  //�����ؽű�
+    _maintain_thread->Run();  //²»¼ÓÔØ½Å±¾
 
     
     if (!ResolveAddress(_maintain_thread->GetIoContext(), std::string(server_address), &_listen_endpoint))
@@ -225,7 +225,7 @@ void ServerImpl::SetReceivedCallBack(Session::session_received_callback_t callba
     _received_callback = callback;
 }
 
-void ServerImpl::SetAcceptCallBack(Session::session_connected_callback_t callback)
+void ServerImpl::SetConnnectCallBack(Session::session_connected_callback_t callback)
 {
     _connected_callback = callback;
 }
@@ -463,9 +463,9 @@ void Server::SetReceivedCallBack(Session::session_received_callback_t callback)
     _impl->SetReceivedCallBack(callback);
 }
 
-void Server::SetAcceptCallBack(Session::session_connected_callback_t callback)
+void Server::SetConnnectCallBack(Session::session_connected_callback_t callback)
 {
-    _impl->SetAcceptCallBack(callback);
+    _impl->SetConnnectCallBack(callback);
 }
 
 void Server::SetCloseCallBack(Session::session_closed_callback_t callback)

@@ -6,16 +6,16 @@ namespace gb
 {
 
 
-//buffer¿é
+//bufferå—
 struct BufferHandle
 {
-    char* data; //Êı¾İÊ×µØÖ·
-    int   size; //Êı¾İ´óĞ¡
+    char* data; //æ•°æ®é¦–åœ°å€
+    int   size; //æ•°æ®å¤§å°
 
     union
     {
-        int capacity; //WriteBuffer Ê¹ÓÃ£¬¿éµÄÈİÁ¿
-        int offset;   //ReadBuffer Ê¹ÓÃ£¬¿éµÄÆğÊ¼Î»ÖÃ
+        int capacity; //WriteBuffer ä½¿ç”¨ï¼Œå—çš„å®¹é‡
+        int offset;   //ReadBuffer ä½¿ç”¨ï¼Œå—çš„èµ·å§‹ä½ç½®
     };
 
     BufferHandle(char* _data, int _capacity) :

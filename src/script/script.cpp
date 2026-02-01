@@ -41,7 +41,7 @@ void Script::PrintTable(lua_State* pState, int index)
 {
 	int top = lua_gettop(pState);
 
-	/// °ÑÕ»ÉÏ¸ø¶¨Ë÷Òý´¦µÄÔªËØ×÷Ò»¸ö¸±±¾Ñ¹Õ»¡£
+	/// æŠŠæ ˆä¸Šç»™å®šç´¢å¼•å¤„çš„å…ƒç´ ä½œä¸€ä¸ªå‰¯æœ¬åŽ‹æ ˆã€‚
 	lua_pushvalue(pState, index);
 
 	fprintf(stdout, "{\n");

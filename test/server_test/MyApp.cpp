@@ -1,17 +1,32 @@
 #include "MyApp.h"
-#include "network/network.h"
 #include "test.h"
 #include "common/res_path.h"
+#include "network/net_manager/network_manager.h"
 int MyApp::OnInit()
 {
-    int*      i = (int*)malloc(sizeof(int));
 	log.Init(ResPath::Instance()->FindResPath("log4/test.log").c_str(), 1024 * 1024 * 1000, 10,
              GbLog::ASYNC, GbLog::CONSOLE_AND_FILE, GbLog::LEVEL_INFO);
 
     gb::WorkerManager* work_mng = gb::WorkerManager::Instance(1);
-    gb::net_init();
-    init_http();
+
+	auto [ip, port] = AppTypeMgr::Instance()->GetServerIpPort();
+	std::string uir = ip + ":" + port;
+	gb::ServerOptions options;
+    options.keep_alive_time = -1;
+    options.io_service_pool_size = 1;
+    server_ = std::make_unique<gb::Server>(options);
+
+    server_->SetConnnectCallBack([](const gb::SessionPtr& session) {
+        LOG_INFO("Accept:{}", session->socket().local_endpoint().address().to_string());
+    });
+    server_->SetCloseCallBack([](const gb::SessionPtr& session) {
+        LOG_INFO("Close:{}", session->socket().local_endpoint().address().to_string());
+    });
+    gb::NetworkManager::Instance()->Init(server_.get());
     Test_Register();
+
+
+    server_->Start(uir);
     return 0;
 }
 

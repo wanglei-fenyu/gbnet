@@ -56,7 +56,7 @@ public:
 
 private:
 	std::vector<IoWorkerPtr> m_workers;
-	std::map<uint32_t, IoWorkerPtr> m_worker_map;			//key �߳�id
+	std::map<uint32_t, IoWorkerPtr> m_worker_map;			//key Ïß³Ìid
     size_t                        _next_service;
 };
 

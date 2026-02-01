@@ -2,22 +2,23 @@
 #include "../session/session.h"
 #include "../timer_worker/timer_worker.h"
 #include "../io_service_pool/io_service_pool.h"
+#include "handle_interface.h"
 namespace gb
 {
 struct ClientOptions
 {
-    int work_thread_num;        //ÍøÂç´¦ÀíÏß³ÌÊı
+    int work_thread_num;        //ç½‘ç»œå¤„ç†çº¿ç¨‹æ•°
     int callback_thread_num;
-    int keep_alive_time;        //±£³ÖÁ¬½ÓµÄÊ±¼ä -1Ã»ÓĞÏŞÖÆ
-    int max_pending_buffer_size;//Ò»¸öÁ¬½ÓµÈ´ı·¢ËÍ¶ÓÁĞ×î´ó»º³åÇø µ¥Î»MB  0±íÊ¾Ã»ÓĞ»º³åÇø Ä¬ÈÏ100MB
+    int keep_alive_time;        //ä¿æŒè¿æ¥çš„æ—¶é—´ -1æ²¡æœ‰é™åˆ¶
+    int max_pending_buffer_size;//ä¸€ä¸ªè¿æ¥ç­‰å¾…å‘é€é˜Ÿåˆ—æœ€å¤§ç¼“å†²åŒº å•ä½MB  0è¡¨ç¤ºæ²¡æœ‰ç¼“å†²åŒº é»˜è®¤100MB
 
-    //ÍøÂçÍÌÍÂ -1±íÊ¾Ã»ÓĞÏŞÖÆ
+    //ç½‘ç»œåå -1è¡¨ç¤ºæ²¡æœ‰é™åˆ¶
     int max_throughput_in;
     int max_throughput_out;
     
     int connect_timeout;  //
     
-    bool no_delay;  //Ä¬ÈÏtrue  
+    bool no_delay;  //é»˜è®¤true  
 
 	ClientOptions()
 	: work_thread_num(4)
@@ -114,7 +115,7 @@ private:
 
 
 
-class Client
+class Client : public HandleInterface
 {
 public:
     explicit Client(const ClientOptions& options = ClientOptions());
@@ -137,9 +138,9 @@ public:
     void Send(CONNECT_TYPE type,const Meta* meta, const ReadBufferPtr& buffer);
 
 public:
-    void SetReceivedCallBack(Session::session_received_callback_t callback);
-    void SetConnnectCallBack(Session::session_connected_callback_t callback);
-    void SetCloseCallBack(Session::session_closed_callback_t callback);
+    virtual void SetReceivedCallBack(Session::session_received_callback_t callback) override;
+    virtual void SetConnnectCallBack(Session::session_connected_callback_t callback) override;
+    virtual void SetCloseCallBack(Session::session_closed_callback_t callback) override;
 
 public:
     const SessionPtr GetSession(CONNECT_TYPE type);

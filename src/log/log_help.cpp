@@ -32,10 +32,10 @@ bool GbLog::Init(const char* nFileName, const int nMaxFileSize, const int nMaxFi
 	{
 //		const char* pFormat = "[%Y-%m-%d %H:%M:%S.%e] <thread %t> [%^%l%$]\n[%@,%!]\n%v\n";
 		const char* pFormat = "%^%Y-%m-%d %H:%M:%S.%e|t:%t|%s:%#|%v%$";
-		//sinkÈİÆ÷
+		//sinkå®¹å™¨
 		std::vector<spdlog::sink_ptr> vecSink;
 
-		//¿ØÖÆÌ¨
+		//æ§åˆ¶å°
 		if (outPos & CONSOLE)
 		{
 			auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -44,7 +44,7 @@ bool GbLog::Init(const char* nFileName, const int nMaxFileSize, const int nMaxFi
 			vecSink.push_back(console_sink);
 		}
 
-		//ÎÄ¼ş
+		//æ–‡ä»¶
 		if (outPos & FILE)
 		{
 			auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(nFileName, nMaxFileSize, nMaxFile);
@@ -53,22 +53,22 @@ bool GbLog::Init(const char* nFileName, const int nMaxFileSize, const int nMaxFi
 			vecSink.push_back(file_sink);
 		}
 
-		//ÉèÖÃloggerÊ¹ÓÃ¶à¸ösink
-		if (outMode == ASYNC)//Òì²½
+		//è®¾ç½®loggerä½¿ç”¨å¤šä¸ªsink
+		if (outMode == ASYNC)//å¼‚æ­¥
 		{
 			spdlog::init_thread_pool(102400, 1);
 			auto tp = spdlog::thread_pool();
 			m_pLogger = std::make_shared<spdlog::async_logger>(LOG_NAME, begin(vecSink), end(vecSink), tp, spdlog::async_overflow_policy::block);
 		}
-		else//Í¬²½
+		else//åŒæ­¥
 		{
 			m_pLogger = std::make_shared<spdlog::logger>(LOG_NAME, begin(vecSink), end(vecSink));
 		}
 		m_pLogger->set_level((spdlog::level::level_enum)outLevel);
 
-		//Óöµ½warn¼¶±ğ£¬Á¢¼´flushµ½ÎÄ¼ş
+		//é‡åˆ°warnçº§åˆ«ï¼Œç«‹å³flushåˆ°æ–‡ä»¶
 		m_pLogger->flush_on(spdlog::level::warn);
-		//¶¨Ê±flushµ½ÎÄ¼ş£¬Ã¿ÈıÃëË¢ĞÂÒ»´Î
+		//å®šæ—¶flushåˆ°æ–‡ä»¶ï¼Œæ¯ä¸‰ç§’åˆ·æ–°ä¸€æ¬¡
 		spdlog::flush_every(std::chrono::seconds(3));
 		spdlog::register_logger(m_pLogger);
 	}

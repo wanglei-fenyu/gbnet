@@ -2,7 +2,7 @@
 
 HttpClient::HttpClient(net::io_context& ioc) : ioc_(ioc) {}
 
-// ---------------- Ğ­³Ì½Ó¿Ú ----------------
+// ---------------- åç¨‹æ¥å£ ----------------
 net::awaitable<HttpResponse> HttpClient::GetAsync(const std::string& host,
                                              const std::string& port,
                                              const std::string& target) {
@@ -17,7 +17,7 @@ net::awaitable<HttpResponse> HttpClient::PostAsync(const std::string& host,
     co_return co_await DoRequest(http::verb::post, host, port, target, body, content_type);
 }
 
-// ---------------- »Øµ÷½Ó¿Ú ----------------
+// ---------------- å›è°ƒæ¥å£ ----------------
 void HttpClient::Get(const std::string& host, const std::string& port,
                      const std::string& target, Callback cb) {
     auto self = shared_from_this();
@@ -49,7 +49,7 @@ void HttpClient::Post(const std::string& host, const std::string& port,
         }, net::detached);
 }
 
-// ---------------- ÄÚ²¿ÊµÏÖ ----------------
+// ---------------- å†…éƒ¨å®ç° ----------------
 net::awaitable<HttpResponse> HttpClient::DoRequest(http::verb method,
                                                    const std::string& host,
                                                    const std::string& port,
@@ -65,7 +65,7 @@ net::awaitable<HttpResponse> HttpClient::DoRequest(http::verb method,
     // connect
     co_await stream.async_connect(results, net::use_awaitable);
 
-    // ¹¹ÔìÇëÇó
+    // æ„é€ è¯·æ±‚
     if (method == http::verb::get) {
         http::request<http::empty_body> req{method, target, 11};
         req.set(http::field::host, host);
@@ -81,12 +81,12 @@ net::awaitable<HttpResponse> HttpClient::DoRequest(http::verb method,
         co_await http::async_write(stream, req, net::use_awaitable);
     }
 
-    // ¶ÁÈ¡ÏìÓ¦
+    // è¯»å–å“åº”
     beast::flat_buffer buffer;
     http::response<http::string_body> res;
     co_await http::async_read(stream, buffer, res, net::use_awaitable);
 
-    // ¹Ø±ÕÁ¬½Ó
+    // å…³é—­è¿æ¥
     beast::error_code ec;
     stream.socket().shutdown(tcp::socket::shutdown_both, ec);
 

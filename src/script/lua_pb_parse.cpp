@@ -111,14 +111,14 @@ int lua_to_protobuf(lua_State* L)
 	int type = lua_type(L, 2);
 	if (LUA_TTABLE != type)
 	{
-		//ÕâÀïÒª±¨´í
+		//è¿™é‡Œè¦æŠ¥é”™
 		return 0;
 	}
 	
 	google::protobuf::Message* msg = create_message(name);
 	if (msg == NULL)
 	{
-		//ÕÒ²»µ½Ð­Òé¶¨Òå
+		//æ‰¾ä¸åˆ°åè®®å®šä¹‰
 		return 0;
 	}
 	fill_lua_table(L, 2, msg);
@@ -129,7 +129,7 @@ int lua_to_protobuf(lua_State* L)
 
 void fill_lua_table(lua_State* L, int idx, google::protobuf::Message* msg)
 {
-	/// ×÷¸±±¾Ñ¹Õ»¡£
+	/// ä½œå‰¯æœ¬åŽ‹æ ˆã€‚
 	lua_pushvalue(L, idx);
 
 	const google::protobuf::Descriptor* des = msg->GetDescriptor();
