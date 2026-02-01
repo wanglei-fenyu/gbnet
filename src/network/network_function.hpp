@@ -4,8 +4,8 @@
 #include "session/session.h"
 #include <sol/sol.hpp>
 #include <lua.hpp>
-#include "../script/script.h"
-#include "../protobuf/meta.pb.h"
+#include "script/script.h"
+#include "protobuf/meta.pb.h"
 #include "buffer/compressed_stream.h"
 
 

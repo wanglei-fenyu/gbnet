@@ -2,7 +2,7 @@
 #include "common/def.h"
 #include "common/define.h"
 #include <functional>
-#include "../../script/script.h"
+#include "script/script.h"
 #include "concurrentqueue/concurrentqueue.h"
 #include <gbnet/common/define.h>
 #include <map>

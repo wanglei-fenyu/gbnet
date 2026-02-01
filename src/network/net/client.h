@@ -1,7 +1,7 @@
 #pragma once
-#include "../session/session.h"
-#include "../timer_worker/timer_worker.h"
-#include "../io_service_pool/io_service_pool.h"
+#include "network/session/session.h"
+#include "network/timer_worker/timer_worker.h"
+#include "network/io_service_pool/io_service_pool.h"
 #include "handle_interface.h"
 namespace gb
 {

@@ -1,7 +1,7 @@
 #pragma once 
-#include "../session/session.h"
+#include "network/session/session.h"
 #include "rpc_function.hpp"
-#include "../network_function.hpp"
+#include "network/network_function.hpp"
 
 
 

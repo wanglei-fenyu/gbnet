@@ -1,6 +1,6 @@
 #include "io_service_pool.h"
 #include "log/log_help.h"
-#include "../../script/register_script.h"
+#include "script/register_script.h"
 #include <memory>
 
 namespace gb

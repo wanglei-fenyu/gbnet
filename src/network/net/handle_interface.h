@@ -1,6 +1,5 @@
 #pragma once 
-#include "..\session\session.h"
-
+#include "network/session/session.h"
 namespace gb
 {
 

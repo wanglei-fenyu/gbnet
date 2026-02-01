@@ -1,13 +1,13 @@
 #pragma once 
 #include <functional>
 #include <type_traits>
-#include "../session/session.h"
+#include "network/session/session.h"
 #include <sol/sol.hpp>
 #include <lua.hpp>
-#include "../../script/script.h"
-#include "../../protobuf/meta.pb.h"
+#include "script/script.h"
+#include "protobuf/meta.pb.h"
 #include "rpc_reply.h"
-#include "../msgpack/msgpack.hpp"
+#include "network/msgpack/msgpack.hpp"
 #include <gbnet/buffer/compressed_stream.h>
 #include "rpc_function_help.h"
 

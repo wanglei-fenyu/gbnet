@@ -1,7 +1,7 @@
 #pragma once 
 #include <sol/sol.hpp>
-#include "../msgpack/msgpack.hpp"
-#include "../session/session.h"
+#include "network/msgpack/msgpack.hpp"
+#include "network/session/session.h"
 
 namespace gb
 {

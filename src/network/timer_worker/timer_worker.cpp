@@ -1,5 +1,5 @@
 #include "timer_worker.h"
-#include "../../common/timer_help.h"
+#include "common/timer_help.h"
 namespace gb
 {
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../session/session.h"
-#include "../io_service_pool/io_service_pool.h"
+#include "network/session/session.h"
+#include "network/io_service_pool/io_service_pool.h"
 namespace gb
 {
 

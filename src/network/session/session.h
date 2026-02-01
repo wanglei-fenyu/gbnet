@@ -1,8 +1,8 @@
 #pragma once
 #include <gbnet/message_stream/message_stream.h>
 #include <gbnet/common/define.h>
-#include "../../protobuf/meta.pb.h"
-#include "../io_service_pool/io_service_pool.h"
+#include "protobuf/meta.pb.h"
+#include "network/io_service_pool/io_service_pool.h"
 namespace gb
 {
 class Session : public MessageStream 
