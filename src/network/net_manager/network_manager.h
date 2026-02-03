@@ -114,15 +114,13 @@ public:
 	void RpcCancel(int64_t seq_id);
 	void OnReceiveCall(const SessionPtr& session, const ReadBufferPtr& buffer, int meta_size, int64_t data_size);
 
-	std::shared_ptr<Server>& GetServer() { return server_; }
 
 private:
-    inline static thread_local ListenMap       listen_function_map_{};
-    inline static thread_local RpcInterfaceMap rpc_interface_map_{};
-    inline static thread_local RpcCallerMap    rpc_caller_map_{};
-	inline static thread_local int32_t sequence_tail_ = 0;
+    static thread_local ListenMap       listen_function_map_;
+    static thread_local RpcInterfaceMap rpc_interface_map_;
+    static thread_local RpcCallerMap    rpc_caller_map_;
+	static thread_local int32_t sequence_tail_;
 
-	std::shared_ptr<Server> server_;
 };
 
 template <typename T>
