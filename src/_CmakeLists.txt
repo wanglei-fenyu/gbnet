@@ -1,8 +1,6 @@
 include_guard()
 project(server)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-include(def)
-include(base)
 
 add_definitions(-DPROTOBUF_USE_DLLS)  # protobuf使用动态库
 add_compile_definitions(BOOST_ASIO_HAS_STD_THREAD) # asio使用std::thread

@@ -1,8 +1,5 @@
 include_guard()
 project(server_test)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-include(def)
-include(base)
 cmake_policy(SET CMP0144 NEW)
 add_executable(${PROJECT_NAME})
 add_definitions(-DPROTOBUF_USE_DLLS)  # protobuf使用动态库

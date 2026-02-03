@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.16)
 # 添加宏定义
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 project(server_project)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(def)
+include(base)
 
 #设置静态库和动态库的输出目录
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY $<1:${PROJECT_SOURCE_DIR}/$<CONFIG>/lib>)  #动态库默认要在exe同路径 所以生成后是在bin下

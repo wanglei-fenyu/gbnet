@@ -1,7 +1,4 @@
 include_guard()
-
-
-
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 
@@ -11,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)        #禁止使用编译器的扩展
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CONFIGURATION_TYPES "debug;release") # 限定构建模式 统一跨平台大小写
+set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(LINUX true)
