@@ -41,7 +41,7 @@ endif()
 
 if(LINUX)
     add_compile_definitions(LINUX)
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -Og")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
     set(CMAKE_CXX_FLAGS_RELEASE "-g -O2")
     set(CMAKE_CXX_FLAGS_ASAN "-g -Og -fsanitize=address -fsanitize-recover=address -fno-omit-frame-pointer -fsanitize=leak")
     string(APPEND CMAKE_CXX_FLAGS "  -pthread -fcoroutines -Wall -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function -Wunused-result ")
