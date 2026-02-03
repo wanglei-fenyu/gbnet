@@ -44,7 +44,7 @@ struct ServerOptions
 class ServerImpl :public std::enable_shared_from_this<ServerImpl>
 {
 public:
-    static const int MAINTAIN_INTERVAL_IN_MS = 100;     //维护间隔 100ms
+    inline static const int MAINTAIN_INTERVAL_IN_MS = 100;     //维护间隔 100ms
 
 public:
     ServerImpl(const ServerOptions& options);

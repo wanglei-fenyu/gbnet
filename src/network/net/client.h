@@ -37,7 +37,7 @@ struct ClientOptions
 class ClientImpl : public std::enable_shared_from_this<ClientImpl>
 {
 public:
-    static const int MAINTAIN_INTERVAL_IN_MS = 500;
+    inline static const int MAINTAIN_INTERVAL_IN_MS = 500;
 public:
     explicit ClientImpl(const ClientOptions& options);
     virtual ~ClientImpl();
