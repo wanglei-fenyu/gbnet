@@ -115,11 +115,6 @@ public:
 	void OnReceiveCall(const SessionPtr& session, const ReadBufferPtr& buffer, int meta_size, int64_t data_size);
 
 
-private:
-    static thread_local ListenMap       listen_function_map_;
-    static thread_local RpcInterfaceMap rpc_interface_map_;
-    static thread_local RpcCallerMap    rpc_caller_map_;
-	static thread_local int32_t sequence_tail_;
 
 };
 

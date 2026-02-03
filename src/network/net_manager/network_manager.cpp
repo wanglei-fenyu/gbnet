@@ -5,10 +5,10 @@
 
 NAMESPACE_BEGIN(gb)
 
-thread_local NetworkManager::ListenMap         NetworkManager::listen_function_map_{};
-thread_local NetworkManager::RpcInterfaceMap NetworkManager::rpc_interface_map_{};
-thread_local NetworkManager::RpcCallerMap NetworkManager::rpc_caller_map_{};
-thread_local int32_t NetworkManager::sequence_tail_ = 0;
+static thread_local NetworkManager::ListenMap       listen_function_map_{};
+static thread_local NetworkManager::RpcInterfaceMap rpc_interface_map_{};
+static thread_local NetworkManager::RpcCallerMap    rpc_caller_map_{};
+static thread_local int32_t sequence_tail_ = 0;
 
 void NetworkManager::Init(HandleInterface* handleInterface)
 {
