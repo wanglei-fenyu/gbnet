@@ -2,7 +2,7 @@
 #include "network/message_meta.h"
 #include <gbnet/buffer/compressed_stream.h>
 //#include "google/protobuf/io/zero_copy_stream_impl_lite.h"
-#include <google\protobuf\message.h>
+#include "google/protobuf/message.h"
 namespace gb
 {
 	void GetMsgData(gb::Meta& meta, ReadBufferPtr buffer, int meta_size, int64_t data_size, std::string& out_s)
