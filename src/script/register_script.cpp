@@ -4,11 +4,67 @@
 #include "../network/session/session.h"
 #include "../network/net_manager/network_manager.h"
 #include "log/log_help.h"
+#include "network/message_meta.h"
 #include <filesystem>
+#include "buffer/compressed_def.h"
+#include "spdlog/fmt/bundled/format.h"
 using namespace gb;
+
+
 static void register_net(std::shared_ptr<Script>& scriptPtr)
 {
 	auto network		= scriptPtr->create_table("net");
+
+    // 注册 MsgMode 枚举
+    scriptPtr->new_enum<gb::MsgMode>("MsgMode", {
+        {"Msg",      gb::MsgMode::Msg},
+        {"Request",  gb::MsgMode::Request},
+        {"Response", gb::MsgMode::Response}
+    });
+    
+    // 注册 CompressType 枚举
+    scriptPtr->new_enum<CompressType>("CompressType", {
+        {"None", CompressType::CompressTypeNone},
+        {"Gzip", CompressType::CompressTypeGzip},
+        {"Zlib", CompressType::CompressTypeZlib},
+        {"LZ4",  CompressType::CompressTypeLZ4}
+    });
+    
+    // 注册 Meta 结构体
+    scriptPtr->new_usertype<gb::Meta>("Meta",
+        sol::constructors<gb::Meta(), gb::Meta(const gb::Meta&)>(),
+        
+        // 成员变量（可读写）
+        "mode",          &gb::Meta::mode,
+        "id",            &gb::Meta::id,
+        "type",          &gb::Meta::type,
+        "method",        &gb::Meta::method,
+        "sequence",      &gb::Meta::sequence,
+        "compress_type", &gb::Meta::compress_type,
+        
+        // 成员函数（可添加自定义函数）
+        sol::meta_function::to_string, [](const gb::Meta& self) {
+            return "Meta{mode=" + std::to_string(static_cast<int>(self.mode)) 
+                 + ", id=" + std::to_string(self.id)
+                 + ", type=" + std::to_string(self.type)
+                 + ", method=" + std::to_string(self.method)
+                 + ", sequence=" + std::to_string(self.sequence)
+                 + ", compress_type=" + std::to_string(static_cast<int>(self.compress_type))
+                 + "}";
+        },
+        
+        // 比较操作符（可选）
+        sol::meta_function::equal_to, [](const gb::Meta& lhs, const gb::Meta& rhs) {
+            return lhs.mode == rhs.mode 
+                && lhs.id == rhs.id
+                && lhs.type == rhs.type
+                && lhs.method == rhs.method
+                && lhs.sequence == rhs.sequence
+                && lhs.compress_type == rhs.compress_type;
+        }
+    );
+
+
 	network["Listen"]	= [](int type, int id, sol::function  f,std::string protoName = "") {  gb::NetworkManager::Instance()->Listen(type, id, f, protoName); };
 	network["UnListen"] = [](int type, int id, std::string signal, int level = 0) { gb::NetworkManager::Instance()->UnListen(type, id, signal, level); };
     network["Send"]     = sol::overload([](Session* session, int type, int id, std::string protoName, sol::object lua_msg) {
@@ -64,34 +120,35 @@ static void register_log(std::shared_ptr<Script>& scriptPtr)
     if (!logger)
         return;
     auto log    = scriptPtr->create_table("log");
-    log["Info"] = [&scriptPtr](std::string str) {
+    log["Info"] = [&scriptPtr,logger](std::string str) {
 		sol::state_view lua(scriptPtr->lua_state());
         sol::table debug_info = lua["debug"]["getinfo"](2, "Sl");
 		std::string file_path = debug_info["short_src"];
 		std::string file_name = std::filesystem::path(file_path).filename().string();
         int line = debug_info["currentline"];
-        LOG_INFO(file_name+":"+std::to_string(line)+ "|" + str)
+        logger->log(spdlog::level::info,  file_name + ":" + std::to_string(line) + "|" + str);
     };
-    log["Error"] = [&scriptPtr](std::string str) {
+    log["Error"] = [&scriptPtr,logger](std::string str) {
 		sol::state_view lua(scriptPtr->lua_state());
         sol::table debug_info = lua["debug"]["getinfo"](2, "Sl");
 		std::string file_path = debug_info["short_src"];
 		std::string file_name = std::filesystem::path(file_path).filename().string();
         int line = debug_info["currentline"];
-        LOG_ERROR(file_name + ":" + std::to_string(line) + "|" + str)
+        logger->log(spdlog::level::err,  file_name + ":" + std::to_string(line) + "|" + str);
     };
-    log["Warning"] = [&scriptPtr](std::string str) {
+    log["Warning"] = [&scriptPtr,logger](std::string str) {
 		sol::state_view lua(scriptPtr->lua_state());
         sol::table debug_info = lua["debug"]["getinfo"](2, "Sl");
 		std::string file_path = debug_info["short_src"];
 		std::string file_name = std::filesystem::path(file_path).filename().string();
         int line = debug_info["currentline"];
-        LOG_WARN( file_name + ":" + std::to_string(line) + "|" + str)
+        logger->log(spdlog::level::warn,file_name + ":" + std::to_string(line) + "|" + str);
     };
 
 
 
 }
+
 
 static void register_msgpack(std::shared_ptr<Script>& scriptPtr)
 {
@@ -120,7 +177,7 @@ static void register_msgpack(std::shared_ptr<Script>& scriptPtr)
 
 extern void register_proto_msg(std::shared_ptr<Script>& scriptPtr);
 
-void register_script(std::shared_ptr<Script>& scriptPtr)
+void _lua_(std::shared_ptr<Script>& scriptPtr)
 {
 	register_log(scriptPtr);
 	register_msgpack(scriptPtr);

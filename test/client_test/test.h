@@ -1,5 +1,4 @@
 #pragma once
-#include "protobuf/meta.pb.h"
 #include "protobuf/msg.pb.h"
 #include "async_simple/coro/Lazy.h"
 #include "async_simple/coro/SyncAwait.h"

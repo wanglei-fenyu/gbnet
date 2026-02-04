@@ -5,7 +5,7 @@
 #include <sol/sol.hpp>
 #include <lua.hpp>
 #include "script/script.h"
-#include "protobuf/meta.pb.h"
+#include "network/message_meta.h"
 #include "rpc_reply.h"
 #include "network/msgpack/msgpack.hpp"
 #include <gbnet/buffer/compressed_stream.h>
@@ -15,7 +15,7 @@ namespace gb
 {
 
 
-typedef std::function<void(const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size)> rpc_listen_fun;
+typedef std::function<void(const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size)> rpc_listen_fun;
 
 template <typename T>
 class HasCallOperator
@@ -59,7 +59,7 @@ struct RpcFunctionaTraits<sol::function, sol::function>
         //auto            lua_state = func.lua_state();
         //sol::state_view lua_view(lua_state);
 
-        return [state, func](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [state, func](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             int      top = lua_gettop(state->lua_state());
 			std::string s = "";
 			GetMsgData(meta, buffer, meta_size, data_size,s);
@@ -91,7 +91,7 @@ struct RpcFunctionaTraits<R (*)(), F>
 {
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             f();
         };
     }
@@ -105,7 +105,7 @@ struct RpcFunctionaTraits<R (*)(P0), F>
 
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             if constexpr (std::is_base_of<google::protobuf::Message, PP0>::value)
             {
                 PP0 p0;
@@ -137,7 +137,7 @@ struct RpcFunctionaTraits<R (*)(P0, P1), F>
 
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             if constexpr (std::is_same<RpcReply, PP0>::value)
             {
 
@@ -179,7 +179,7 @@ struct RpcFunctionaTraits<R (*)(P0, P1, P2), F>
 
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             std::string s = "";
             GetMsgData(meta, buffer, meta_size, data_size,s);
             if constexpr (std::is_same<RpcReply, PP0>::value)
@@ -207,7 +207,7 @@ struct RpcFunctionaTraits<R (*)(P0, P1, P2, P3), F>
 
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer,gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             std::string s = "";
             GetMsgData(meta, buffer, meta_size, data_size,s);
             if constexpr (std::is_same<RpcReply, PP0>::value)
@@ -238,7 +238,7 @@ struct RpcFunctionaTraits<R (*)(P0, P1, P2, P3, P4), F>
 
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             std::string s = "";
             GetMsgData(meta, buffer, meta_size, data_size,s);
             if constexpr (std::is_same<RpcReply, PP0>::value)
@@ -268,7 +268,7 @@ struct RpcFunctionaTraits<R (*)(P0, P1, P2, P3, P4, P5), F>
 
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             std::string s = "";
             GetMsgData(meta, buffer, meta_size, data_size,s);
             if constexpr (std::is_same<RpcReply, PP0>::value)
@@ -301,7 +301,7 @@ struct RpcFunctionaTraits<R (C::*)() const, F>
 {
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             f();
         };
     }
@@ -315,7 +315,7 @@ struct RpcFunctionaTraits<R (C::*)(P0) const, F>
 
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             if constexpr (std::is_base_of<google::protobuf::Message, PP0>::value)
             {
                 PP0 p0;
@@ -347,7 +347,7 @@ struct RpcFunctionaTraits<R (C::*)(P0, P1) const, F>
 
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             if constexpr (std::is_same<RpcReply, PP0>::value)
             {
 
@@ -389,7 +389,7 @@ struct RpcFunctionaTraits<R (C::*)(P0, P1, P2), F>
 
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             std::string s = "";
             GetMsgData(meta, buffer, meta_size, data_size,s);
             if constexpr (std::is_same<RpcReply, PP0>::value)
@@ -417,7 +417,7 @@ struct RpcFunctionaTraits<R (C::*)(P0, P1, P2, P3), F>
 
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             std::string s = "";
             GetMsgData(meta, buffer, meta_size, data_size,s);
             if constexpr (std::is_same<RpcReply, PP0>::value)
@@ -447,7 +447,7 @@ struct RpcFunctionaTraits<R (C::*)(P0, P1, P2, P3, P4), F>
 
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             std::string s = "";
             GetMsgData(meta, buffer, meta_size, data_size,s);
             if constexpr (std::is_same<RpcReply, PP0>::value)
@@ -477,7 +477,7 @@ struct RpcFunctionaTraits<R (C::*)(P0, P1, P2, P3, P4, P5), F>
 
     static rpc_listen_fun make(F f)
     {
-        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size) -> void {
+        return [f](const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size) -> void {
             std::string s = "";
             GetMsgData(meta, buffer, meta_size, data_size,s);
             if constexpr (std::is_same<RpcReply, PP0>::value)

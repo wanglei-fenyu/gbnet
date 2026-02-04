@@ -111,7 +111,7 @@ void Worker::InitLua()
 		return;
 	scriptPtr_->open_libraries(lib::base, lib::package,lib::string,lib::table,lib::os,lib::bit32,lib::coroutine,lib::count,lib::debug,lib::ffi,lib::io,lib::jit,lib::math,lib::utf8);
 	//注册脚本 
-	register_script(scriptPtr_);
+	_lua_(scriptPtr_);
     sol::function require = (*scriptPtr_)["require"];
 #ifdef MY_DEBUG_MODE
     std::string _lua_socket = ResPath::Instance()->FindResPath("../Debug/bin/");

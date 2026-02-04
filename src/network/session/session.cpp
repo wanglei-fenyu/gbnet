@@ -79,14 +79,9 @@ void Session::Send(const Meta* meta)
 	   
 			NETWORK_LOG("reserve message header failed");
 		}
-		if (!meta->SerializeToZeroCopyStream(&write_buffer))
-		{
-			NETWORK_LOG("serialize meta failed");
-		}
-		
+        write_buffer.Append(reinterpret_cast<const char*>(meta), sizeof(*meta));
 		header.meta_size = static_cast<int>(write_buffer.ByteCount() - header_pos - header_size);
 		header.message_size = header.meta_size + header.data_size;
-		
 		write_buffer.SetData(header_pos, reinterpret_cast<const char*>(&header), header_size);
 
     }
@@ -110,7 +105,7 @@ void Session::Send(const Meta* meta, const google::protobuf::Message* message)
     {
         NETWORK_LOG("reserve message header failed");
     }
-	if (!meta->SerializeToZeroCopyStream(&write_buffer))
+    if (!write_buffer.Append(reinterpret_cast<const char*>(meta), sizeof(*meta)))
 	{
 		NETWORK_LOG("serialize meta failed");
 	}
@@ -118,7 +113,7 @@ void Session::Send(const Meta* meta, const google::protobuf::Message* message)
     
     header.meta_size = static_cast<int>(write_buffer.ByteCount() - header_pos - header_size);
 
-    if ((CompressType)meta->compress_type() == CompressType::CompressTypeNone)
+    if (meta->compress_type == CompressType::CompressTypeNone)
     {
         if (!message->SerializeToZeroCopyStream(&write_buffer))
         {
@@ -128,7 +123,7 @@ void Session::Send(const Meta* meta, const google::protobuf::Message* message)
     }
     else
     {
-        std::shared_ptr<AbstractCompressedOutputStream> os(get_compressed_output_stream(&write_buffer, (CompressType)meta->compress_type()));
+        std::shared_ptr<AbstractCompressedOutputStream> os(get_compressed_output_stream(&write_buffer, meta->compress_type));
         if (!message->SerializeToZeroCopyStream(os.get()))
         {
 			NETWORK_LOG("serialize data failed");
@@ -159,13 +154,13 @@ void Session::Send(const Meta* meta, const std::vector<uint8_t>& data)
         NETWORK_LOG("reserve message header failed");
     }
    
-    if (!meta->SerializeToZeroCopyStream(&write_buffer))
-    {
-        NETWORK_LOG("serialize meta failed");
-    }
+    if (!write_buffer.Append(reinterpret_cast<const char*>(meta), sizeof(*meta)))
+	{
+		NETWORK_LOG("serialize meta failed");
+	}
     header.meta_size = static_cast<int>(write_buffer.ByteCount() - header_pos - header_size);
 
-    if ((CompressType)meta->compress_type() == CompressType::CompressTypeNone)
+    if (meta->compress_type == CompressType::CompressTypeNone)
     {
         write_buffer.Append((char*)data.data(), data.size());
     }
@@ -173,7 +168,7 @@ void Session::Send(const Meta* meta, const std::vector<uint8_t>& data)
     {
         std::string  compressed;
         google::protobuf::io::StringOutputStream o(&compressed);
-        std::shared_ptr<AbstractCompressedOutputStream> os(get_compressed_output_stream(&o, (CompressType)meta->compress_type()));
+        std::shared_ptr<AbstractCompressedOutputStream> os(get_compressed_output_stream(&o, meta->compress_type));
         {
 			google::protobuf::io::CodedOutputStream c(os.get());
             c.WriteVarint32(data.size());
@@ -204,13 +199,13 @@ void Session::Send(const Meta* meta, std::string_view data)
         NETWORK_LOG("reserve message header failed");
     }
    
-    if (!meta->SerializeToZeroCopyStream(&write_buffer))
-    {
-        NETWORK_LOG("serialize meta failed");
-    }
+    if (!write_buffer.Append(reinterpret_cast<const char*>(meta), sizeof(*meta)))
+	{
+		NETWORK_LOG("serialize meta failed");
+	}
     header.meta_size = static_cast<int>(write_buffer.ByteCount() - header_pos - header_size);
 
-    if ((CompressType)meta->compress_type() == CompressType::CompressTypeNone)
+    if (meta->compress_type == CompressType::CompressTypeNone)
     {
         write_buffer.Append((char*)data.data(), data.size());
     }
@@ -218,7 +213,7 @@ void Session::Send(const Meta* meta, std::string_view data)
     {
         std::string                                     compressed;
         google::protobuf::io::StringOutputStream        o(&compressed);
-        std::shared_ptr<AbstractCompressedOutputStream> os(get_compressed_output_stream(&o, (CompressType)meta->compress_type()));
+        std::shared_ptr<AbstractCompressedOutputStream> os(get_compressed_output_stream(&o, meta->compress_type));
         {
             google::protobuf::io::CodedOutputStream c(os.get());
             c.WriteVarint32(data.size());
@@ -248,15 +243,15 @@ void Session::Send(const Meta* meta, const char* data, std::size_t size)
         NETWORK_LOG("reserve message header failed");
     }
    
-    if (!meta->SerializeToZeroCopyStream(&write_buffer))
-    {
-        NETWORK_LOG("serialize meta failed");
-    }
+    if (!write_buffer.Append(reinterpret_cast<const char*>(meta), sizeof(*meta)))
+	{
+		NETWORK_LOG("serialize meta failed");
+	}
     
     header.meta_size = static_cast<int>(write_buffer.ByteCount() - header_pos - header_size);
 
 
-    if ((CompressType)meta->compress_type() == CompressType::CompressTypeNone)
+    if (meta->compress_type == CompressType::CompressTypeNone)
     {
         write_buffer.Append(data,size);
     }
@@ -264,7 +259,7 @@ void Session::Send(const Meta* meta, const char* data, std::size_t size)
     {
         std::string                                     compressed;
         google::protobuf::io::StringOutputStream        o(&compressed);
-        std::shared_ptr<AbstractCompressedOutputStream> os(get_compressed_output_stream(&o, (CompressType)meta->compress_type()));
+        std::shared_ptr<AbstractCompressedOutputStream> os(get_compressed_output_stream(&o, meta->compress_type));
         {
             google::protobuf::io::CodedOutputStream c(os.get());
             c.WriteVarint32(size);
@@ -293,13 +288,13 @@ void Session::Send(const Meta* meta, const ReadBufferPtr& data_buffer)
         NETWORK_LOG("reserve message header failed");
     }
    
-    if (!meta->SerializeToZeroCopyStream(&write_buffer))
-    {
-        NETWORK_LOG("serialize meta failed");
-    }
+    if (!write_buffer.Append(reinterpret_cast<const char*>(meta), sizeof(*meta)))
+	{
+		NETWORK_LOG("serialize meta failed");
+	}
     
     header.meta_size = static_cast<int>(write_buffer.ByteCount() - header_pos - header_size);
-    if ((CompressType)meta->compress_type() == CompressType::CompressTypeNone)
+    if (meta->compress_type == CompressType::CompressTypeNone)
     {
         std::string  data = data_buffer->ToString();
         write_buffer.Append(data.data(),data.size());
@@ -308,7 +303,7 @@ void Session::Send(const Meta* meta, const ReadBufferPtr& data_buffer)
     {
         std::string                                     compressed;
         google::protobuf::io::StringOutputStream        o(&compressed);
-        std::shared_ptr<AbstractCompressedOutputStream> os(get_compressed_output_stream(&o, (CompressType)meta->compress_type()));
+        std::shared_ptr<AbstractCompressedOutputStream> os(get_compressed_output_stream(&o, meta->compress_type));
         {
             std::string                             data = data_buffer->ToString();
             google::protobuf::io::CodedOutputStream c(os.get());

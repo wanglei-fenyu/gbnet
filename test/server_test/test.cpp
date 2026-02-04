@@ -1,6 +1,6 @@
 #include "test.h"
 #include "common/worker/worker_manager.h"
-
+#include "network/message_meta.h"
 void hello(const std::shared_ptr<gb::Session>& session)
 {
 	LOG_INFO("Hello")
@@ -8,9 +8,9 @@ void hello(const std::shared_ptr<gb::Session>& session)
 
 void World(const std::shared_ptr<gb::Session>& session,TestMsg& msg)
 {
-	Meta meta;
-	meta.set_id(2);
-	meta.set_type(1);
+	gb::Meta meta;
+	meta.id = 2;
+	meta.type = 11;
 	session->Send(&meta,&msg);
 	LOG_INFO("wrold {}",msg.msg())
 }
@@ -38,7 +38,7 @@ void square(gb::RpcReply reply, int a)
 void test_ret_args(gb::RpcReply reply,int a,std::string b)
 {
     LOG_INFO("{}:{}", a, b);
-    reply.GetMeta().set_compress_type(MsgCompressType::CompressNone);
+    reply.GetMeta().compress_type = CompressTypeNone;
     reply.Invoke(a*2, b+" hello");
 }
 

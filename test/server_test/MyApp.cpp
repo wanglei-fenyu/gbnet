@@ -7,7 +7,7 @@ int MyApp::OnInit()
 	log.Init(ResPath::Instance()->FindResPath("log4/test.log").c_str(), 1024 * 1024 * 1000, 10,
              GbLog::ASYNC, GbLog::CONSOLE_AND_FILE, GbLog::LEVEL_INFO);
 
-    gb::WorkerManager* work_mng = gb::WorkerManager::Instance(1);
+    gb::WorkerManager* work_mng = gb::WorkerManager::Instance(3);
 
 	auto [ip, port] = AppTypeMgr::Instance()->GetServerIpPort();
 	std::string uir = ip + ":" + port;

@@ -7,7 +7,7 @@
 #include "network/rpc/rpc_call.h"
 #include "network/rpc/rpc_reply.h"
 #include "network/rpc/rpc_function.hpp"
-#include "protobuf/meta.pb.h"
+#include "network/message_meta.h"
 #include "async_simple/coro/Lazy.h"
 #include "async_simple/coro/SyncAwait.h"
 #include "async_simple/executors/SimpleExecutor.h"
@@ -54,12 +54,12 @@ public:
 
 	void UnListen(int type, int id, std::string signal, int level = 0);
 
-	void Dispatch(const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size);
+	void Dispatch(const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size);
 
 	uint64_t GetSequence();
 
 	void CallImpl(RpcCallPtr call, std::string method, sol::variadic_args& args);
-	void CallImpl(Meta& meta, RpcCallPtr call, const ReadBufferPtr buffer = nullptr);
+	void CallImpl(gb::Meta& meta, RpcCallPtr call, const ReadBufferPtr buffer = nullptr);
 
 	template<typename ...Args>
 	void Call(RpcCallPtr call, std::string method, Args&&... args)
@@ -70,10 +70,10 @@ public:
 		}
 		Meta meta;
 		uint64_t method_key = MD5::MD5Hash64(method.c_str());
-		meta.set_method(method_key);
+		meta.method = method_key;
 		uint64_t seq_id = GetSequence();
-		meta.set_sequence(seq_id);
-		meta.set_mode(MsgMode::Request);
+		meta.sequence = seq_id;
+		meta.mode = MsgMode::Request;
 		call->SetId(seq_id);
 		if constexpr (sizeof...(args) > 0)
 		{

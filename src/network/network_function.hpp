@@ -5,7 +5,7 @@
 #include <sol/sol.hpp>
 #include <lua.hpp>
 #include "script/script.h"
-#include "protobuf/meta.pb.h"
+#include "network/message_meta.h"
 #include "buffer/compressed_stream.h"
 
 
@@ -57,14 +57,14 @@ struct NetFunctionaTraits<sol::function, sol::function>
                 lua_settop(lua_view.lua_state(), top);
                 return;
             }
-            if ((CompressType)meta.compress_type() == CompressType::CompressTypeNone)
+            if (meta.compress_type== CompressType::CompressTypeNone)
             {
 				if (msg->ParsePartialFromZeroCopyStream(buffer.get()))
 					fn(session,lua_messgae);
             }
             else
             {
-                 std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), (CompressType)meta.compress_type()));
+                 std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), meta.compress_type));
 				if (msg->ParsePartialFromZeroCopyStream(is.get()))
 					fn(session,lua_messgae);
             }
@@ -95,14 +95,14 @@ struct NetFunctionaTraits<R (*)(P0),F>
 			{
 				typename std::decay<P0>::type p0;
                 
-				if ((CompressType)meta.compress_type() == CompressType::CompressTypeNone)
+				if (meta.compress_type == CompressType::CompressTypeNone)
 				{
 					if(p0.ParsePartialFromZeroCopyStream(buffer.get()))
 						fn(p0);
 				}
 				else
 				{
-                    std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), (CompressType)meta.compress_type()));
+                    std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), meta.compress_type));
                     if (p0.ParsePartialFromZeroCopyStream(is.get()))
                         fn(p0);
 				}
@@ -129,14 +129,14 @@ struct NetFunctionaTraits<R (*)(P0,P1),F>
             {
                 tP1 p1;
 
-				if ((CompressType)meta.compress_type() == CompressType::CompressTypeNone)
+				if (meta.compress_type == CompressType::CompressTypeNone)
 				{
 					if (p1.ParsePartialFromZeroCopyStream(buffer.get()))
 						fn(session, std::forward<P1>(p1));
 				}
 				else
 				{
-                    std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), (CompressType)meta.compress_type()));
+                    std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), meta.compress_type));
                     if (p1.ParsePartialFromZeroCopyStream(is.get()))
                         fn(session,std::forward<P1>(p1));
 				}
@@ -144,14 +144,14 @@ struct NetFunctionaTraits<R (*)(P0,P1),F>
             else if constexpr (std::is_base_of<google::protobuf::Message, tP0>::value && std::is_base_of<google::protobuf::Message, tP1>::value)
             {
                 typename std::decay<P0>::type p1;
-				if ((CompressType)meta.compress_type() == CompressType::CompressTypeNone)
+				if (meta.compress_type == CompressType::CompressTypeNone)
 				{
 					if (p1.ParsePartialFromZeroCopyStream(buffer.get()))
 						fn(meta, std::forward<P1>(p1));
 				}
 				else
 				{
-                    std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), (CompressType)meta.compress_type()));
+                    std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), meta.compress_type));
                     if (p1.ParsePartialFromZeroCopyStream(is.get()))
                         fn(meta, std::forward<P1>(p1));
 				}
@@ -188,14 +188,14 @@ struct NetFunctionaTraits<R (C::*)(P0) const,F>
             {
                 typename std::decay<P0>::type p0;
 
-                if ((CompressType)meta.compress_type() == CompressType::CompressTypeNone)
+                if (meta.compress_type == CompressType::CompressTypeNone)
                 {
                     if (p0.ParsePartialFromZeroCopyStream(buffer.get()))
                         fn(p0);
                 }
                 else
                 {
-                    std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), (CompressType)meta.compress_type()));
+                    std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), meta.compress_type));
                     if (p0.ParsePartialFromZeroCopyStream(is.get()))
                         fn(p0);
                 }
@@ -221,14 +221,14 @@ struct NetFunctionaTraits<R (C::*)(P0,P1) const,F>
             {
                 typename std::decay<P1>::type p1;
 
-                if ((CompressType)meta.compress_type() == CompressType::CompressTypeNone)
+                if (meta.compress_type == CompressType::CompressTypeNone)
                 {
                     if (p1.ParsePartialFromZeroCopyStream(buffer.get()))
                         fn(session, p1);
                 }
                 else
                 {
-                    std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), (CompressType)meta.compress_type()));
+                    std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), meta.compress_type));
                     if (p1.ParsePartialFromZeroCopyStream(is.get()))
                         fn(session, p1);
                 }
@@ -236,14 +236,14 @@ struct NetFunctionaTraits<R (C::*)(P0,P1) const,F>
             else if constexpr (std::is_base_of<google::protobuf::Message, tP0>::value && std::is_base_of<google::protobuf::Message, tP1>::value)
             {
                 typename std::decay<P0>::type p1;
-                if ((CompressType)meta.compress_type() == CompressType::CompressTypeNone)
+                if (meta.compress_type == CompressType::CompressTypeNone)
                 {
                     if (p1.ParsePartialFromZeroCopyStream(buffer.get()))
                         fn(meta, std::forward<P1>(p1));
                 }
                 else
                 {
-                    std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), (CompressType)meta.compress_type()));
+                    std::shared_ptr<AbstractCompressedInputStream> is(get_compressed_input_stream(buffer.get(), meta.compress_type));
                     if (p1.ParsePartialFromZeroCopyStream(is.get()))
                         fn(meta, p1);
                 }

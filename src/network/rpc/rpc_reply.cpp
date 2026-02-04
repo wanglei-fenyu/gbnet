@@ -7,13 +7,13 @@ namespace gb
 RpcReply::RpcReply(Meta& meta, const std::shared_ptr<Session>& session) :
     meta_(meta), session_(session)
 {
-    meta_.set_mode(MsgMode::Response);
+    meta_.mode = MsgMode::Response;
 }
 
 RpcReply::RpcReply(Meta&& meta, const std::shared_ptr<Session>& session) :
     meta_(meta), session_(session)
 {
-    meta_.set_mode(MsgMode::Response);
+    meta_.mode=MsgMode::Response;
 }
 
 void RpcReply::Send(const std::vector<uint8_t>& data)
@@ -21,7 +21,7 @@ void RpcReply::Send(const std::vector<uint8_t>& data)
     if (session_ && Valid())
     {
         SequenceId Id;
-        Id.value = meta_.sequence();
+        Id.value = meta_.sequence;
         session_->Send(&meta_, data);
     }
 }

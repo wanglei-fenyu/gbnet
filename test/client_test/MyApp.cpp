@@ -5,19 +5,26 @@
 static bool is_net_init = false;
 
 
-
-
 async_simple::coro::Lazy<> test_coro_2(const gb::SessionPtr& session)
 {
-	gb::RpcCallPtr call = std::make_shared<gb::RpcCall>();
-	call->SetSession(session);
-    //co_await gb::CoRpc<>::execute(call, "test_rpc");
+    try
+    {
+		gb::RpcCallPtr call = std::make_shared<gb::RpcCall>();
+		call->SetSession(session);
+		//co_await gb::CoRpc<>::execute(call, "test_rpc");
 
-    int num = co_await gb::CoRpc<int>::execute(call, "square", 10000);
-    LOG_INFO("CORO_TEST  {}", num);
+		int num = co_await gb::CoRpc<int>::execute(call, "square", 10000);
+		LOG_INFO("CORO_TEST  {}", num);
 
-    auto [a, b] = co_await gb::CoRpc<int, std::string>::execute(call, "test_ret_args", 2, "world");
-    LOG_INFO("coro_test_2  {} {}", a, b);
+		auto [a, b] = co_await gb::CoRpc<int, std::string>::execute(call, "test_ret_args", 2, "world");
+		LOG_INFO("coro_test_2  {} {}", a, b);
+
+    }
+    catch (...)
+    {
+
+		LOG_ERROR("unkonw");
+    }
 }
 
 
@@ -26,7 +33,7 @@ int MyApp::OnInit()
 	log.Init(ResPath::Instance()->FindResPath("log4/test.log").c_str(), 1024 * 1024 * 1000, 10,
 		   GbLog::ASYNC, GbLog::CONSOLE_AND_FILE, GbLog::LEVEL_INFO);
 
-    gb::WorkerManager* work_mng = gb::WorkerManager::Instance(4);
+    gb::WorkerManager* work_mng = gb::WorkerManager::Instance(2);
     gb::ClientOptions options;
     options.keep_alive_time = -1;
     client_.reset(new gb::Client(options));
@@ -67,7 +74,7 @@ int MyApp::OnInit()
             test_coro_2(client_->GetSession(gb::CONNECT_TYPE::CT_GATEWAY)).start([](auto&&) {});
             });
 
-        http_test(client_);
+        //http_test(client_);
     });
 
     

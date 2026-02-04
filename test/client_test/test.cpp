@@ -1,5 +1,6 @@
 ﻿#include "test.h"
 #include "network/http/http_client.h"
+#include "network/message_meta.h"
 void hello(TestMsg& msg)
 {
 	LOG_INFO("index:{}  msg{}",msg.index(), msg.msg());
@@ -16,11 +17,11 @@ void SendMsg1(std::shared_ptr<gb::Client> client)
     msg.set_index(111);
     msg.set_msg("gb gb gb");
 
-    Meta meta;
-    meta.set_mode(MsgMode::Msg);
-    meta.set_type(1);
-    meta.set_id(2);
-    meta.set_compress_type(MsgCompressType::CompressZlib);
+    gb::Meta meta;
+    meta.mode = gb::MsgMode::Msg;
+    meta.type = 1;
+    meta.id = 2;
+    meta.compress_type = CompressTypeGzip;
 
     client->Send(gb::CONNECT_TYPE::CT_GATEWAY, &meta, &msg);
 }

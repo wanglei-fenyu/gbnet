@@ -4,7 +4,6 @@
 #include "../net/server.h"
 
 NAMESPACE_BEGIN(gb)
-
 static thread_local NetworkManager::ListenMap       listen_function_map_{};
 static thread_local NetworkManager::RpcInterfaceMap rpc_interface_map_{};
 static thread_local NetworkManager::RpcCallerMap    rpc_caller_map_{};
@@ -58,17 +57,17 @@ void NetworkManager::UnListen(int type, int id, std::string signal, int level)
 
 void NetworkManager::Send(Session* session, int type, int id, google::protobuf::Message& msg)
 {
-	Meta meta;
-	meta.set_id(id);
-	meta.set_type(type);
+	gb::Meta meta;
+	meta.id = id;
+	meta.type = type;
 	session->Send(&meta, &msg);
 }
 
 void NetworkManager::Send(std::shared_ptr<Session> session, int type, int id, google::protobuf::Message& msg)
 {
-	Meta meta;
-	meta.set_id(id);
-	meta.set_type(type);
+	gb::Meta meta;
+	meta.id = id;
+	meta.type = type;
 	session->Send(&meta, &msg);
 }
 
@@ -84,12 +83,12 @@ void NetworkManager::CallImpl(RpcCallPtr call, std::string method, sol::variadic
 	{
 		return;
 	}
-	Meta meta;
+	gb::Meta meta;
 	uint64_t    method_key = MD5::MD5Hash64(method.c_str());
-	meta.set_method(method_key);
+	meta.method = method_key;
 	uint64_t seq_id = GetSequence();
-	meta.set_sequence(seq_id);
-	meta.set_mode(MsgMode::Request);
+	meta.sequence = seq_id;
+	meta.mode = MsgMode::Request;
 	call->SetId(seq_id);
 	if (args.size() > 0)
 	{
@@ -106,13 +105,13 @@ void NetworkManager::CallImpl(RpcCallPtr call, std::string method, sol::variadic
 	}
 }
 
-void NetworkManager::CallImpl(Meta& meta, RpcCallPtr call, const ReadBufferPtr buffer)
+void NetworkManager::CallImpl(gb::Meta& meta, RpcCallPtr call, const ReadBufferPtr buffer)
 {
 	if (!call)
 		return;
-	if (!rpc_caller_map_.insert({meta.sequence(), call}).second)
+	if (!rpc_caller_map_.insert({meta.sequence, call}).second)
 	{
-		LOG_ERROR("insert gs_RpcCallerMap fail seq:{} method{}", meta.sequence(), meta.method());
+		LOG_ERROR("insert gs_RpcCallerMap fail seq:{} method{}", meta.sequence, meta.method);
 	}
 	if (buffer && buffer->TotalCount() > 0)
 	{
@@ -143,107 +142,106 @@ void NetworkManager::UnRegister(std::string method)
 	rpc_interface_map_.erase(key);
 }
 
-void NetworkManager::Dispatch(const SessionPtr& session, const ReadBufferPtr& buffer, Meta& meta, int meta_size, int64_t data_size)
+void NetworkManager::Dispatch(const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size)
 {
-	switch (meta.mode())
-	{
-	case MsgMode::Msg:
-	{
-		auto worker = WorkerManager::Instance()->GetWorker(meta.id() % WorkerManager::Instance()->Size());
-		if (worker)
-		{
-			worker->Post([this, session = session, buffer = buffer, meta = std::move(meta), meta_size, data_size]() mutable
-				{
-					uint64_t key = (((uint64_t)meta.type()) << 32) + (int)meta.id();
-					auto fun = listen_function_map_.find(key);
-					if (fun != listen_function_map_.end())
-						fun->second(session, buffer, meta, meta_size, data_size);
-				});
-		}
+    switch (meta.mode)
+    {
+        case MsgMode::Msg:
+        {
+            auto worker = WorkerManager::Instance()->GetWorker(meta.id % WorkerManager::Instance()->Size());
+            if (worker)
+            {
+                worker->Post([this, session = session, buffer = buffer, meta = std::move(meta), meta_size, data_size]() mutable {
+                    uint64_t key = (((uint64_t)meta.type) << 32) + (int)meta.id;
+                    auto     fun = listen_function_map_.find(key);
+                    if (fun != listen_function_map_.end())
+                        fun->second(session, buffer, meta, meta_size, data_size);
+                });
+            }
 #if USE_MAIN_THREAD
-		else
-		{
-			uint64_t key = (((uint64_t)meta.type()) << 32) + (int)meta.id();
-			auto     fun = listen_function_map_.find(key);
-			if (fun != listen_function_map_.end())
-				fun->second(session, buffer, meta, meta_size, data_size);
-		}
+            else
+            {
+                uint64_t key = (((uint64_t)meta.type()) << 32) + (int)meta.id();
+                auto     fun = listen_function_map_.find(key);
+                if (fun != listen_function_map_.end())
+                    fun->second(session, buffer, meta, meta_size, data_size);
+            }
 #endif
-		break;
-	}
-
-	case MsgMode::Request:
-	{
-		auto worker = WorkerManager::Instance()->GetWorker(meta.id() % WorkerManager::Instance()->Size());
-		if (worker)
-		{
-			worker->Post([this, session = session, buffer = buffer, meta = std::move(meta), meta_size, data_size]() mutable
-				{
-					uint64_t key  = meta.method();
-					auto     func = rpc_interface_map_.find(key);
-					if (func == rpc_interface_map_.end())
-						return;
-					func->second(session, buffer, meta, meta_size, data_size);
-				});
-		}
+            break;
+        }
+        case MsgMode::Request:
+        {
+            auto worker = WorkerManager::Instance()->GetWorker(meta.id % WorkerManager::Instance()->Size());
+            if (worker)
+            {
+                worker->Post([this, session = session, buffer = buffer, meta = std::move(meta), meta_size, data_size]() mutable {
+                    uint64_t key  = meta.method;
+                    auto     func = rpc_interface_map_.find(key);
+                    if (func == rpc_interface_map_.end())
+                        return;
+                    func->second(session, buffer, meta, meta_size, data_size);
+                });
+            }
 #if USE_MAIN_THREAD
-		else
-		{
-			int64_t key  = meta.method();
-			auto     fun = rpc_interface_map_.find(key);
-			if (fun != rpc_interface_map_.end())
-				fun->second(session, buffer, meta, meta_size, data_size);
-		}
+            else
+            {
+                int64_t key = meta.method();
+                auto    fun = rpc_interface_map_.find(key);
+                if (fun != rpc_interface_map_.end())
+                    fun->second(session, buffer, meta, meta_size, data_size);
+            }
 #endif
-		break;
-	}
-	case MsgMode::Response:
-	{
-		SequenceId Id;
-		Id.value = meta.sequence();
-		auto worker = WorkerManager::Instance()->GetWorker(Id.index);
-		if (worker)
-		{
-			worker->Post([this, worker, session = session, buffer = buffer, meta = std::move(meta), meta_size, data_size]() mutable
-				{
-					uint32_t   thread = worker->GetWorkerId();
-					uint64_t seq       = meta.sequence();
-					auto  it         = rpc_caller_map_.find(seq);
-					if (it == rpc_caller_map_.end())
-						return;
-					if (it->second)
-						it->second->Done(session, buffer, meta, meta_size, data_size);
-					rpc_caller_map_.erase(it);
-				});
-		}
+            break;
+        }
+        case MsgMode::Response:
+        {
+            SequenceId Id;
+            Id.value    = meta.sequence;
+            auto worker = WorkerManager::Instance()->GetWorker(Id.index);
+            if (worker)
+            {
+                worker->Post([this, worker, session = session, buffer = buffer, meta = std::move(meta), meta_size, data_size]() mutable {
+                    uint32_t thread = worker->GetWorkerId();
+                    uint64_t seq    = meta.sequence;
+                    auto     it     = rpc_caller_map_.find(seq);
+                    if (it == rpc_caller_map_.end())
+                        return;
+                    if (it->second)
+                        it->second->Done(session, buffer, meta, meta_size, data_size);
+                    rpc_caller_map_.erase(it);
+                });
+            }
 #if USE_MAIN_THREAD
-		else
-		{
-			std::thread::id id        = std::this_thread::get_id();
-			uint32_t        thread_id = *((uint32_t*)&id);
-			SequenceId sequence;
-			sequence.value = meta.sequence();
-			auto            it        = rpc_caller_map_.find(sequence.value);
-			if (it == rpc_caller_map_.end())
-				return;
-			if (it->second)
-				it->second->Done(session, buffer, meta, meta_size, data_size);
-			rpc_caller_map_.erase(it);
-		}
+            else
+            {
+                std::thread::id id        = std::this_thread::get_id();
+                uint32_t        thread_id = *((uint32_t*)&id);
+                SequenceId      sequence;
+                sequence.value = meta.sequence();
+                auto it        = rpc_caller_map_.find(sequence.value);
+                if (it == rpc_caller_map_.end())
+                    return;
+                if (it->second)
+                    it->second->Done(session, buffer, meta, meta_size, data_size);
+                rpc_caller_map_.erase(it);
+            }
 #endif
-	}
-	default:
-		break;
-	}
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 void NetworkManager::OnReceiveCall(const SessionPtr& session, const ReadBufferPtr& buffer, int meta_size, int64_t data_size)
 {
-	Meta meta;
-	if (meta.ParseFromBoundedZeroCopyStream(buffer.get(), meta_size))
-	{
-		Dispatch(session, buffer, meta, meta_size, data_size);
-	}
+	gb::Meta meta;
+    if (!ReadMeta(buffer.get(), meta, meta_size))
+    {
+        LOG_ERROR("read meta failed!");
+        return;
+    }
+	Dispatch(session, buffer, meta, meta_size, data_size);
 }
 
 NAMESPACE_END
