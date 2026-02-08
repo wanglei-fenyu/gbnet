@@ -2,7 +2,28 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include "gbnet/log/net_log_help.h"
 using namespace std;
+
+
+
+
+static void NetlogToSpdlog(netlog::Level level, const char* msg, size_t len)
+{
+    auto logger = spdlog::get(LOG_NAME);
+    if (!logger) return;
+    spdlog::level::level_enum lv = spdlog::level::info;
+    switch (level)
+    {
+        case netlog::Level::Trace: lv = spdlog::level::trace; break;
+        case netlog::Level::Debug: lv = spdlog::level::debug; break;
+        case netlog::Level::Info: lv = spdlog::level::info; break;
+        case netlog::Level::Warning: lv = spdlog::level::warn; break;
+        case netlog::Level::Error: lv = spdlog::level::err; break;
+        case netlog::Level::Fatal: lv = spdlog::level::critical; break;
+    }
+    logger->log(lv, "{}", std::string_view(msg, len));
+}
 
 GbLog::GbLog()
 	:m_bInit(false)
@@ -30,16 +51,14 @@ bool GbLog::Init(const char* nFileName, const int nMaxFileSize, const int nMaxFi
 
 	try
 	{
-//		const char* pFormat = "[%Y-%m-%d %H:%M:%S.%e] <thread %t> [%^%l%$]\n[%@,%!]\n%v\n";
-		const char* pFormat = "%^%Y-%m-%d %H:%M:%S.%e|t:%t|%s:%#|%v%$";
 		//sink容器
 		std::vector<spdlog::sink_ptr> vecSink;
 
 		//控制台
 		if (outPos & CONSOLE)
 		{
+			const char* pFormat = "%^%Y-%m-%d %H:%M:%S.%e|t:%t|%s:%#|%v%$";
 			auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-			//console_sink->set_level(spdlog::level::trace);
 			console_sink->set_pattern(pFormat);
 			vecSink.push_back(console_sink);
 		}
@@ -47,9 +66,9 @@ bool GbLog::Init(const char* nFileName, const int nMaxFileSize, const int nMaxFi
 		//文件
 		if (outPos & FILE)
 		{
-			auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(nFileName, nMaxFileSize, nMaxFile);
-			//file_sink->set_level(spdlog::level::trace);
-			file_sink->set_pattern(pFormat);
+			const char* file_pattern = "[%l]|%Y-%m-%d %H:%M:%S.%e|t:%t|%s:%#|%v";
+            auto        file_sink    = std::make_shared<spdlog::sinks::daily_file_sink_mt>(nFileName, 0,0);
+            file_sink->set_pattern(file_pattern);
 			vecSink.push_back(file_sink);
 		}
 
@@ -71,6 +90,9 @@ bool GbLog::Init(const char* nFileName, const int nMaxFileSize, const int nMaxFi
 		//定时flush到文件，每三秒刷新一次
 		spdlog::flush_every(std::chrono::seconds(3));
 		spdlog::register_logger(m_pLogger);
+
+		//注册网络日志
+		netlog::SetLogSink(&NetlogToSpdlog);
 	}
 	catch (const spdlog::spdlog_ex& ex)
 	{

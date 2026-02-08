@@ -1,17 +1,18 @@
-#include <iostream>
-#include <sstream>
-#include <stdexcept>
+#pragma once
+
 #include <string>
 #include <chrono>
-#include <iomanip>
-#include <mutex>
 #include <format>
-#include <source_location>
+#include <stdexcept>
+#include <cstdint>
+#include <ctime>
 
 namespace netlog
 {
 
-// 使用 enum class 避免名称冲突
+//------------------------------------------------------------
+// 日志级别
+//------------------------------------------------------------
 enum class Level : uint8_t
 {
     Trace,
@@ -22,59 +23,101 @@ enum class Level : uint8_t
     Fatal
 };
 
-// 线程安全的日志流
-inline std::ostream& getLogStream()
+//------------------------------------------------------------
+// 日志 Sink（可注入）
+// ⚠️ 函数指针，保证 DLL ABI 安全
+//------------------------------------------------------------
+using LogSink = void (*)(Level level, const char* msg, size_t len);
+
+//------------------------------------------------------------
+// 默认 Sink（兜底，不建议生产用）
+//------------------------------------------------------------
+inline void DefaultLogSink(Level, const char* msg, size_t len)
 {
-    static std::mutex logMutex;
-    std::lock_guard<std::mutex> lock(logMutex);
-    return std::cerr;
+    fwrite(msg, 1, len, stderr);
+    fputc('\n', stderr);
 }
 
-// 获取格式化的当前时间字符串
-inline std::string getCurrentTime()
+//------------------------------------------------------------
+// 当前 Sink（进程级）
+//------------------------------------------------------------
+inline LogSink& GetLogSink()
 {
-    auto now = std::chrono::system_clock::now();
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-                  now.time_since_epoch()) % 1000;
-    auto in_time_t = std::chrono::system_clock::to_time_t(now);
-
-    std::tm time_info;
-    #ifdef _WIN32
-    localtime_s(&time_info, &in_time_t);
-    #else
-    localtime_r(&in_time_t, &time_info);
-    #endif
-
-    char buffer[20];
-    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &time_info);
-
-    return std::format("{}.{:03d}", buffer, ms.count());
+    static LogSink sink = &DefaultLogSink;
+    return sink;
 }
 
-// 日志实现
-template<typename... Args>
-inline void logImpl(Level level, std::format_string<Args...> fmt, Args&&... args)
+//------------------------------------------------------------
+// 对外注入接口（EXE / 宿主调用）
+//------------------------------------------------------------
+inline void SetLogSink(LogSink sink)
 {
-    static const char* levelNames[] = {
+    GetLogSink() = sink ? sink : &DefaultLogSink;
+}
+
+//------------------------------------------------------------
+// 时间格式化：YYYY-MM-DD HH:MM:SS.mmm
+//------------------------------------------------------------
+inline std::string GetCurrentTime()
+{
+    using namespace std::chrono;
+
+    auto now = system_clock::now();
+    auto ms  = duration_cast<milliseconds>(
+                  now.time_since_epoch()) %
+        1000;
+    auto tt = system_clock::to_time_t(now);
+
+    std::tm tm{};
+#ifdef _WIN32
+    localtime_s(&tm, &tt);
+#else
+    localtime_r(&tt, &tm);
+#endif
+
+    char buf[32];
+    std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tm);
+
+    return std::format("{}.{:03d}", buf, ms.count());
+}
+
+//------------------------------------------------------------
+// 日志实现（核心）
+//------------------------------------------------------------
+template <typename... Args>
+inline void logImpl(
+    Level                       level,
+    std::format_string<Args...> fmt,
+    Args&&... args)
+{
+    static constexpr const char* kLevelName[] = {
         "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
-    // 使用 std::format 进行格式化
-    std::string message = std::format(fmt, std::forward<Args>(args)...);
-    
-    auto& stream = getLogStream();
-    stream << "[" << getCurrentTime() << "] "
-           << "[" << levelNames[static_cast<uint8_t>(level)] << "] "
-           << message << std::endl;
+    // 格式化正文
+    std::string body = std::format(
+        fmt, std::forward<Args>(args)...);
+
+    // 拼完整日志行
+    std::string line = std::format(
+        //"[{}][{}] {}",
+        //GetCurrentTime(),
+        //kLevelName[static_cast<uint8_t>(level)],
+        "{}",
+        body);
+
+    // 输出（由宿主决定）
+    auto sink = GetLogSink();
+    sink(level, line.c_str(), line.size());
 
     if (level == Level::Fatal)
-    {
-        throw std::runtime_error(message);
-    }
+        throw std::runtime_error(body);
 }
 
 } // namespace netlog
 
-// 使用 C++20 特性的日志宏
+//------------------------------------------------------------
+// 日志宏
+// //------------------------------------------------------------
 #define NET_LOG_TRACE(fmt, ...) \
     netlog::logImpl(netlog::Level::Trace, fmt, ##__VA_ARGS__)
 
@@ -93,16 +136,16 @@ inline void logImpl(Level level, std::format_string<Args...> fmt, Args&&... args
 #define NET_LOG_FATAL(fmt, ...) \
     netlog::logImpl(netlog::Level::Fatal, fmt, ##__VA_ARGS__)
 
-// 条件日志
-#define NET_LOG_IF(condition, fmt, ...) \
-    do { \
-        if (condition) \
-            netlog::logImpl(netlog::Level::Error, fmt, ##__VA_ARGS__); \
+//------------------------------------------------------------
+// CHECK 宏
+//------------------------------------------------------------
+#define NET_LOG_IF(cond, fmt, ...)                                           \
+    do {                                                                     \
+        if (cond) netlog::logImpl(netlog::Level::Error, fmt, ##__VA_ARGS__); \
     } while (0)
 
-// 检查宏
-#define NET_CHECK(expression) \
-    NET_LOG_IF(!(expression), "CHECK failed: {}", #expression)
+#define NET_CHECK(expr) \
+    NET_LOG_IF(!(expr), "CHECK failed: {}", #expr)
 
 #define NET_CHECK_EQ(a, b) NET_CHECK((a) == (b))
 #define NET_CHECK_NE(a, b) NET_CHECK((a) != (b))

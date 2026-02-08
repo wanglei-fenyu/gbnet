@@ -114,11 +114,32 @@ static void register_net(std::shared_ptr<Script>& scriptPtr)
 }
 
 
+class LuaSourceCache
+{
+public:
+    const char* Intern(const std::string& file)
+    {
+        auto it = files_.find(file);
+        if (it != files_.end())
+            return it->second->c_str();
+
+        auto        ptr = std::make_unique<std::string>(file);
+        const char* ret = ptr->c_str();
+        files_.emplace(file, std::move(ptr));
+        return ret;
+    }
+
+private:
+    std::unordered_map<std::string, std::unique_ptr<std::string>> files_;
+};
+
 static void register_log(std::shared_ptr<Script>& scriptPtr)
 {
     auto logger = spdlog::get(LOG_NAME);
     if (!logger)
         return;
+    static thread_local LuaSourceCache lua_files;
+
     auto log    = scriptPtr->create_table("log");
     log["Info"] = [&scriptPtr,logger](std::string str) {
 		sol::state_view lua(scriptPtr->lua_state());
@@ -126,7 +147,8 @@ static void register_log(std::shared_ptr<Script>& scriptPtr)
 		std::string file_path = debug_info["short_src"];
 		std::string file_name = std::filesystem::path(file_path).filename().string();
         int line = debug_info["currentline"];
-        logger->log(spdlog::level::info,  file_name + ":" + std::to_string(line) + "|" + str);
+        spdlog::source_loc loc(lua_files.Intern(file_name),line, nullptr);
+        logger->log(loc, spdlog::level::info, str);
     };
     log["Error"] = [&scriptPtr,logger](std::string str) {
 		sol::state_view lua(scriptPtr->lua_state());
@@ -134,7 +156,8 @@ static void register_log(std::shared_ptr<Script>& scriptPtr)
 		std::string file_path = debug_info["short_src"];
 		std::string file_name = std::filesystem::path(file_path).filename().string();
         int line = debug_info["currentline"];
-        logger->log(spdlog::level::err,  file_name + ":" + std::to_string(line) + "|" + str);
+        spdlog::source_loc loc(lua_files.Intern(file_name),line, nullptr);
+        logger->log(loc, spdlog::level::err, str);
     };
     log["Warning"] = [&scriptPtr,logger](std::string str) {
 		sol::state_view lua(scriptPtr->lua_state());
@@ -142,7 +165,8 @@ static void register_log(std::shared_ptr<Script>& scriptPtr)
 		std::string file_path = debug_info["short_src"];
 		std::string file_name = std::filesystem::path(file_path).filename().string();
         int line = debug_info["currentline"];
-        logger->log(spdlog::level::warn,file_name + ":" + std::to_string(line) + "|" + str);
+        spdlog::source_loc loc(lua_files.Intern(file_name),line, nullptr);
+        logger->log(loc, spdlog::level::warn, str);
     };
 
 
