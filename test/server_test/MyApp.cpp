@@ -1,5 +1,6 @@
 #include "MyApp.h"
 #include "test.h"
+#include "common/worker/worker_manager.h"
 #include "common/res_path.h"
 #include "network/net_manager/network_manager.h"
 int MyApp::OnInit()
@@ -30,32 +31,41 @@ int MyApp::OnInit()
     return 0;
 }
 
-int MyApp::OnStartup(gb::WorkerPtr worker)
+int MyApp::OnStartup()
 {
-    if (worker)
-        worker->Post([worker]() { worker->OnStartup();});
+    gb::WorkerManager* work_mng = gb::WorkerManager::Instance(3);
+    auto               workers  = work_mng->GetWorkers();
+    for (auto worker : workers)
+    {
+        if (worker)
+        {
+            worker->InitDriving(&tick_id_, &cvMutex_, &cv_);
+			worker->Post([worker]() { worker->OnStartup();});
+        }
+    }
     return 0;
 }
 
-int MyApp::OnUpdate(gb::WorkerPtr worker)
+int MyApp::OnUpdate(float elapsed)
 {
-    if (worker)
-        worker->Post([worker]() { worker->OnUpdate(); });
     return 0;
 }
 
-int MyApp::OnTick(gb::WorkerPtr worker, float elapsed)
+int MyApp::OnTick()
 {
-    if (worker)
-        worker->Post([worker,elapsed]() { worker->OnTick(elapsed); });
     return 0;
 
 }
 
-int MyApp::OnCleanup(gb::WorkerPtr worker)
+int MyApp::OnCleanup()
 {
-    if (worker)
-        worker->Post([worker]() { worker->OnCleanup(); });
+    gb::WorkerManager* work_mng = gb::WorkerManager::Instance(3);
+    auto               workers  = work_mng->GetWorkers();
+    for (auto worker : workers)
+    {
+        if (worker)
+            worker->Post([worker]() { worker->OnCleanup(); });
+    }
     return 0;
 }
 

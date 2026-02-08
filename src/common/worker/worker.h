@@ -18,14 +18,15 @@ public:
 	virtual ~Worker();
 public:
     void Init(uint32_t id, size_t index);
+    void InitDriving(std::atomic<uint64_t>* global_tick_id, std::mutex* global_tick_mutex, std::condition_variable* global_tick_cv);
     void OnStart();
 	void Run();
 	void Stop();
 
 public:
     virtual int OnStartup();
-    virtual int OnUpdate();
-    virtual int OnTick(float elapsed);
+    virtual int OnUpdate(float elapsed);
+    virtual int OnTick();
     virtual int OnCleanup();
 public:
 	void Post(const std::function<void(void)>& handler);
@@ -48,6 +49,11 @@ private:
 	moodycamel::ConcurrentQueue<std::function<void(void)>> events_;
     std::unique_ptr<TimerManager>                                  timer_manager_;
 	std::atomic<bool> runing_ = false;
+    uint64_t local_tick_id_ = 0;
+
+    std::atomic<uint64_t>* tick_id_ = nullptr;
+    std::mutex* cvMutex = nullptr;
+	std::condition_variable* cv = nullptr;
 };
 
 using WorkerPtr = std::shared_ptr<Worker>;

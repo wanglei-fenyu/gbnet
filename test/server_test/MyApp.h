@@ -13,10 +13,10 @@ public:
 
 protected:
 	virtual int OnInit();
-	virtual int OnStartup(gb::WorkerPtr);
-	virtual int OnUpdate(gb::WorkerPtr);
-	virtual int OnTick(gb::WorkerPtr, float);
-	virtual int OnCleanup(gb::WorkerPtr);
+	virtual int OnStartup();
+	virtual int OnUpdate(float);
+	virtual int OnTick();
+	virtual int OnCleanup();
     virtual int OnUnInit();
 
 private:

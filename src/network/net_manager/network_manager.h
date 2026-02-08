@@ -54,7 +54,7 @@ public:
 
 	void UnListen(int type, int id, std::string signal, int level = 0);
 
-	void Dispatch(const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size);
+	virtual void Dispatch(const SessionPtr& session, const ReadBufferPtr& buffer, gb::Meta& meta, int meta_size, int64_t data_size);
 
 	uint64_t GetSequence();
 

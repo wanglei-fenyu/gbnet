@@ -1,5 +1,6 @@
 #include "MyApp.h"
 #include "network/net_manager/network_manager.h"
+#include "common/worker/worker_manager.h"
 #include "test.h"
 #include "common/res_path.h"
 static bool is_net_init = false;
@@ -86,51 +87,42 @@ int MyApp::OnInit()
     return 0;
 }
 
-int MyApp::OnStartup(gb::WorkerPtr worker)
+int MyApp::OnStartup()
 {
-    if (worker)
-        worker->Post([worker]() {worker->OnStartup();});
+    gb::WorkerManager* work_mng = gb::WorkerManager::Instance(3);
+    auto               workers  = work_mng->GetWorkers();
+    for (auto worker : workers)
+    {
+        if (worker)
+        {
+            worker->InitDriving(&tick_id_,&cvMutex_,&cv_);
+			worker->Post([worker]() {worker->OnStartup();});
+        }
+    }
       
     return 0;
 }
 
-int MyApp::OnUpdate(gb::WorkerPtr worker)
+int MyApp::OnUpdate(float elapsed)
 {
-    if (worker)
-        worker->Post([worker]() { worker->OnUpdate(); });
     return 0;
 }
 
-int MyApp::OnTick(gb::WorkerPtr worker, float elapsed)
+int MyApp::OnTick()
 {
+    return 0;
 
-    if (is_net_init)
+}
+
+int MyApp::OnCleanup()
+{
+    gb::WorkerManager* work_mng = gb::WorkerManager::Instance(3);
+    auto               workers  = work_mng->GetWorkers();
+    for (auto worker : workers)
     {
-        is_net_init = false;
-        //SendMsg1(client_);
-       // SendRpc(client_);
-  //       auto worker = client_->GetIoServicePool()->GetWorker(client_->GetSession(gb::CONNECT_TYPE::CT_GATEWAY)->GetIoServicePoolIndex());
-		//if (worker.has_value())
-		//{
-  //          worker.value()->Post([this]() mutable
-		//		{
-  //                  async_simple::coro::syncAwait(test_coro_2(client_->GetSession(gb::CONNECT_TYPE::CT_GATEWAY)));
-		//		});
-		//}
-        //
-        // async_simple::coro::syncAwait(test_coro_2(client_->GetSession(gb::CONNECT_TYPE::CT_GATEWAY)));
-
+        if (worker)
+            worker->Post([worker]() { worker->OnCleanup(); });
     }
-    if (worker)
-        worker->Post([worker,elapsed]() { worker->OnTick(elapsed); });
-    return 0;
-
-}
-
-int MyApp::OnCleanup(gb::WorkerPtr worker)
-{
-    if (worker)
-        worker->Post([worker]() { worker->OnCleanup(); });
     return 0;
 }
 

@@ -23,6 +23,14 @@ void Worker::Init(uint32_t id, size_t index)
     index_     = index;
 }
 
+void Worker::InitDriving(std::atomic<uint64_t>* global_tick_id, std::mutex* global_tick_mutex, std::condition_variable* global_tick_cv)
+{
+    tick_id_ = global_tick_id;
+    cvMutex  = global_tick_mutex;
+    cv       = global_tick_cv;
+    local_tick_id_ = *tick_id_;
+}
+
 void Worker::OnStart()
 {
     LOG_INFO("Start");
@@ -36,13 +44,24 @@ void Worker::OnStart()
 
 void Worker::Run()
 {
+    auto last_time = std::chrono::steady_clock::now();
     while (runing_)
     {
-        if (events_.size_approx() > 0)
+        if (!tick_id_ || !cv || !cvMutex)
         {
-			std::function<void(void)> func;
-			events_.try_dequeue(func);
-			func();
+            continue;
+        }
+        std::unique_lock<std::mutex> lk(*cvMutex);
+        cv->wait(lk);
+		auto                         current_time = std::chrono::steady_clock::now();
+		std::chrono::duration<float> elapsed      = current_time - last_time;
+		last_time                                 = current_time;
+        OnUpdate(elapsed.count());
+		uint64_t g_tick_id = tick_id_->load(std::memory_order_acquire);
+        while(local_tick_id_ < g_tick_id)
+        {
+            OnTick();
+            ++local_tick_id_;
         }
     }
 }
@@ -58,15 +77,21 @@ int Worker::OnStartup()
     return 0;
 }
 
-int Worker::OnUpdate()
-{
-    return 0;
-}
-
-int Worker::OnTick(float elapsed)
+int Worker::OnUpdate(float elapsed)
 {
     if (timer_manager_)
         timer_manager_->Update();
+	while(events_.size_approx() > 0)
+	{
+		std::function<void(void)> func;
+		events_.try_dequeue(func);
+		func();
+	}
+    return 0;
+}
+
+int Worker::OnTick()
+{
     return 0;
 }
 

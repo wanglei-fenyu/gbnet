@@ -14,62 +14,42 @@ int App::Init()
 {
     if (OnInit() != 0) return -1;
     runding_ = true;
+    tick_id_ = 0;
     return 0;
 }
 
 void App::Stop()
 {
     runding_ = false;
-    gb::WorkerManager* work_mng = gb::WorkerManager::Instance(4);
-    if (work_mng)
-    {
-        for (auto& t :work_mng->GetThreads())
-        {
-            t.join();
-        }
-    }
 }
 
 void App::Run()
 {
 
-   gb::WorkerManager* work_mng = gb::WorkerManager::Instance();
-   if (!work_mng)
+   if (0 != OnStartup())
    {
-       LOG_INFO(" worker manager create fail");
-       return;
-   }
-   for (size_t i = 0; i < work_mng->Size();i++)
-   {
-       if (0 != OnStartup(work_mng->GetWorker(i)))
-       {
-            LOG_INFO("OnStartup fail: worker index{}", i);
-           return;
-       }
+	   return;
    }
 
-    auto last_time = std::chrono::high_resolution_clock::now();
+    auto last_time = std::chrono::steady_clock::now();
     while (runding_)
     {
-        auto                         current_time = std::chrono::high_resolution_clock::now();
+        auto                         current_time = std::chrono::steady_clock::now();
         std::chrono::duration<float> elapsed      = current_time - last_time;
         last_time                                 = current_time;
-        
-	    for (size_t i = 0; i < work_mng->Size();i++)
-	    {
-           gb::WorkerPtr work = work_mng->GetWorker(i);
-		   if (OnUpdate(work) != 0)
-		   {
-			   break;
-		   }
+        tick_id_.fetch_add(1, std::memory_order_release);
+        cv_.notify_all();
+        if (OnUpdate(elapsed.count()) != 0)
+        {
+            break;
+        }
 
-		   if (OnTick(work, elapsed.count()) != 0)
-		   {
-			   break;
-		   }
+	    if (OnTick() != 0)
+	    {
+		   break;
 	    }
 
-        auto frame_end_time = std::chrono::high_resolution_clock::now();
+        auto frame_end_time = std::chrono::steady_clock::now();
         auto frame_time     = frame_end_time - current_time;
 
         if (frame_time < frame_duration_)
@@ -78,14 +58,10 @@ void App::Run()
         }
     }
 
-    for (size_t i = 0; i < work_mng->Size();i++)
-    {
-        if (0 != OnCleanup(work_mng->GetWorker(i)))
-        {
-            LOG_INFO("OnCleanup fail: worker index {}", i);
-            return;
-        }
-    }
+	if (0 != OnCleanup())
+	{
+		return;
+	}
 
     OnUnInit();
 }

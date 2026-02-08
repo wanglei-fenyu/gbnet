@@ -15,12 +15,12 @@ enum MsgMode : uint8_t
 
 struct Meta
 {
-    MsgMode      mode{Msg};
-    int32_t      id{0};
-    int32_t      type{0};
-    int64_t      method{0};
-    int64_t      sequence{0};
-    CompressType compress_type{CompressTypeNone};
+    MsgMode      mode{Msg};         //消息类型 msg rpc rpc回复
+    CompressType compress_type{CompressTypeNone};   //压缩类型
+    uint32_t      id{0};            //用户唯一表示
+    uint32_t      type{0};          // msg类型
+    uint64_t      method{0};        //rpc方法
+    uint64_t      sequence{0};      //rpc Id
 };
 
 

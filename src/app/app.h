@@ -1,6 +1,5 @@
 #pragma once
 #include "app_def.h"
-#include "../common/worker/worker_manager.h"
 #include <memory>
 #include <chrono>
 #include <atomic>
@@ -19,14 +18,20 @@ public:
 
 protected:
 	virtual int OnInit() = 0;
-    virtual int OnStartup(gb::WorkerPtr) = 0;
-    virtual int OnUpdate(gb::WorkerPtr) = 0;
-    virtual int OnTick(gb::WorkerPtr, float) = 0;
-    virtual int OnCleanup(gb::WorkerPtr) = 0;
+    virtual int OnStartup() = 0;
+    virtual int OnUpdate(float) = 0;
+    virtual int OnTick() = 0;
+    virtual int OnCleanup() = 0;
     virtual int OnUnInit() = 0;
 
 private:
 	APP_TYPE appType_;
     std::atomic<bool> runding_;
     std::chrono::milliseconds frame_duration_;
+
+protected:
+    std::atomic<uint64_t>     tick_id_;
+    std::mutex                cvMutex_;
+    std::condition_variable   cv_;
+    ;
 };
