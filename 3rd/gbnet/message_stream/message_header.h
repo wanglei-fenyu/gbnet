@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
-
-#define MESSAGE_HEAD_MAGIC 322122u
+//47:G 42:N  67:g 62:b
+#define MESSAGE_HEAD_MAGIC 47426762u
 
 namespace gb
 {
